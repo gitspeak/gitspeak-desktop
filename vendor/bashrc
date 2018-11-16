@@ -1,0 +1,20 @@
+if [ -f $HOME/.profile ]; then
+	source $HOME/.profile
+elif [ -f $HOME/.bash_profile ]; then
+	source $HOME/.bash_profile
+elif [ -f $HOME/.bashrc ]; then
+	source $HOME/.bashrc
+fi
+
+export CLICOLOR=1
+
+# export PS1="\W:"
+# export SCRIMBA_TEST="\W:"
+
+LS_COLORS=$LS_COLORS:'di=0;35:';
+export LS_COLORS
+
+# ls --color=auto &> /dev/null && alias ls='ls --color=auto' ||
+
+export PS1="\[$(tput setaf 5)\]\[$(tput bold)\]\W$ \[$(tput sgr0)\]"
+alias ls='ls -F -G'

@@ -1,0 +1,15 @@
+
+libdot/js/lib.js
+libdot/js/lib_colors.js
+libdot/js/lib_f.js
+libdot/js/lib_utf8.js
+
+hterm/js/hterm.js
+@echo hterm.Keyboard = { KeyActions: {} };
+hterm/js/hterm_parser.js
+hterm/js/hterm_text_attributes.js
+hterm/js/hterm_vt.js
+hterm/js/hterm_vt_character_map.js
+
+@echo exports.lib = lib; exports.hterm = hterm;
+
