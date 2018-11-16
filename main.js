@@ -12,7 +12,8 @@ fixPath();
 
 const {fstat} = require('./lib/fs');
 
-const HOST = process.env.GSHOST || 'sindre.gitspeak.com:8443' || 'gitspeak.com';
+const HOST = process.env.GSHOST || 'gitspeak.com';
+
 // process.noAsar = true;
 
 // Keep a global reference of the window object, if you don't, the window will
