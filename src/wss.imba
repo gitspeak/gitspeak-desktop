@@ -1,5 +1,7 @@
 var WebSocket = require 'ws'
 
+# let wss = WebSocket.Server.new({port: 48010})
+
 import {Terminal} from './terminal'
 import {FileSystem} from './fs'
 
@@ -13,8 +15,7 @@ class SocketClient
 		@ws = ws
 		@ws.on 'message' do |message|
 			try onmessage(JSON.parse(message))
-		@ws.on 'close' do
-			yes
+		@ws.on 'close' do dispose
 		setup(@options)
 		self
 	
@@ -31,6 +32,9 @@ class SocketClient
 		if widget and widget[msg[0]] isa Function
 			widget[msg[0]].apply(widget,msg[1])
 		self
+	
+	def dispose
+		widget?.dispose
 
 class TerminalClient < SocketClient
 	def setup opts
@@ -47,7 +51,7 @@ class FileSystemClient < SocketClient
 export class SocketServer
 	
 	def initialize
-		@port = process:env.PORT
+		@port = process:env.TUNNEL_PORT
 		self
 
 	def log *params
@@ -56,6 +60,7 @@ export class SocketServer
 		self
 
 	def start
+		log "starting socket server on {@port}"
 		@wss = WebSocket.Server.new(port: @port)
 		@wss.on 'connection' do |ws,req|
 			try

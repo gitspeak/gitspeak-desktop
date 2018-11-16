@@ -27,3 +27,6 @@ export class Component
 	
 	def toJSON
 		{ref: ref}
+		
+	def dispose
+		self

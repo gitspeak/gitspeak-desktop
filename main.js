@@ -13,12 +13,10 @@ fixPath();
 const {fstat} = require('./lib/fs');
 
 const HOST = process.env.GSHOST || 'gitspeak.com';
-
 // process.noAsar = true;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-
 let main
 let ide
 let tunnel
@@ -103,8 +101,6 @@ const editMenu = {
   }
 
 
-
-let windows = {}
 var url_scheme = "gitspeak";
 protocol.registerStandardSchemes([url_scheme]);
 
@@ -119,12 +115,21 @@ async function setupTunnel(){
 
   console.log("tunnel port",state.tunnelPort);
 
+  process.env.TUNNEL_PORT = state.tunnelPort;
+  let env = {
+    PATH: process.env.PATH, 
+    TUNNEL_PORT: state.tunnelPort
+  };
+
   tunnel = cp.fork('./lib/wss', [], {
-    env: {'PATH': process.env.PATH, 'PORT': state.tunnelPort},
+    env: env,
+    cwd: __dirname,
     silent: true
   })
 
-  tunnel.stdout.on('data', (data) => { console.log("got data!",String(data)); })
+  tunnel.stdout.on('data', (data) => { 
+    devToolsLog(String(data));
+  })
 }
 
 function openIDE(params){
@@ -133,10 +138,13 @@ function openIDE(params){
   ide.webContents.send('message',{type: 'openSession', data: params});
 }
 
+var logQueue = [];
 function devToolsLog(s) {
   console.log(s)
   if (main && main.webContents) {
-    main.webContents.executeJavaScript(`console.log("${s}")`)
+    main.webContents.send('message',{type: 'log', data: s});
+  } else {
+    logQueue.push(s);
   }
 }
 
@@ -144,7 +152,6 @@ async function setupApplication () {
   await setupTunnel();
 
   // Create the browser window.
-
   main = new BrowserWindow({
     width: 1280,
     height: 900,
@@ -165,14 +172,12 @@ async function setupApplication () {
  
 
 
-
-  windows.main = main;
   main.setMenu(null);
   state.currentWindow = main;
   main.loadURL("https://" + HOST + "/");
-
+  devToolsLog(logQueue);
+  console.log("logging!!!",logQueue);
   var doc = main.webContents;
-  // doc.openDevTools();
 
   doc.on('will-navigate', function(event, url) {
     console.log("will navigate to",url);
@@ -188,7 +193,6 @@ async function setupApplication () {
 
     var outerPos = main.getPosition();
     var outerSize = main.getSize();
-    console.log('pos!',outerPos,outerSize);
 
     var defaults = {
       ghlogin: {
@@ -270,8 +274,6 @@ async function setupApplication () {
     }
   });
 
-  windows.ide = ide;
-
   ide.on('focus',()=> {state.currentWindow = ide})
   ide.on('close', function(e){
     if(ide.forceClose) return;
@@ -280,6 +282,7 @@ async function setupApplication () {
   });
   ide.loadURL("https://" + HOST + "/ide");
 
+  ide.on('closed', function () { ide = null });
   // setTimeout(function(){
   //   openIDE({cwd: '/repos/bees', baseRef: 'head'}); // 12fb3cd
   //   ide.webContents.toggleDevTools();
@@ -382,7 +385,8 @@ app.on('activate', function () {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (main === null) {
-    createWindow()
+    // should not be possible(!)
+    // createWindow()
   }
 })
 

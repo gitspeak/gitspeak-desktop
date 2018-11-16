@@ -48,3 +48,6 @@ export class Terminal < Component
 		
 	def write string
 		@runner?.write(string)
+	
+	def dispose
+		self

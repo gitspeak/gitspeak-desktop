@@ -383,9 +383,6 @@ export class FileSystem < Component
 
 	def mv src, dest
 		throw "not implemented"
-		src = resolvePath(src)
-		dest = resolvePath(dest)
-		log "mv",src,dest
-		# console.log "move command",src,dest
-		if src and dest and !get(dest)
-			extfs.renameSync(src,dest)
+	
+	def dispose
+		self
