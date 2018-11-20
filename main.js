@@ -9,7 +9,7 @@ const fixPath = require('fix-path');
 const log = require('electron-log');
 const { autoUpdater } = require("electron-updater");
 fixPath(); 
-
+console.log('process.env: ', process.env)
 const {fstat} = require('./lib/fs');
 
 const HOST = process.env.GSHOST || 'gitspeak.com';
@@ -25,6 +25,7 @@ let state = {
   currentWindow: null,
   tunnelPort: null
 };
+var logQueue = [];
 
 // Start tunnel in separate process to avoid blocking main thread.
 // Pages will communicate with this via local websocket server
@@ -33,6 +34,7 @@ let state = {
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
 log.info('App starting...');
+
 
 autoUpdater.on('checking-for-update', () => {
   devToolsLog('Checking for update...');
@@ -100,7 +102,6 @@ const editMenu = {
     ]
   }
 
-
 var url_scheme = "gitspeak";
 protocol.registerStandardSchemes([url_scheme]);
 
@@ -138,7 +139,7 @@ function openIDE(params){
   ide.webContents.send('message',{type: 'openSession', data: params});
 }
 
-var logQueue = [];
+
 function devToolsLog(s) {
   console.log(s)
   if (main && main.webContents) {
@@ -245,10 +246,17 @@ async function setupApplication () {
     }
   })
 
-  main.on('focus',()=> {state.currentWindow = main})
+  main.on('focus',() => {state.currentWindow = main})
+
+  main.on('close', (e) => {
+    e.preventDefault();
+    console.log('main close')
+    main.hide();
+  })
 
   // Emitted when the window is closed.
   main.on('closed', function () {
+    console.log('closed!! ')
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
@@ -367,13 +375,25 @@ app.on('ready', () => {
 });
 
 app.on('before-quit', () => {
+  console.log('before-quit')
   tunnel.send({type: 'kill'});
   tunnel.kill('SIGINT')
-  ide.forceClose = true;
+  devToolsLog('about to forceClose ide. ide: ',ide)
+  if (ide) {
+    ide.forceClose = true;
+  }
+});
+app.on('will-quit', () => {
+  console.log('will-quit')
+});
+
+app.on('quit', () => {
+  console.log('quit')
 });
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
+  console.log('window-all-closed')
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
@@ -382,6 +402,7 @@ app.on('window-all-closed', function () {
 })
 
 app.on('activate', function () {
+  main.show();
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (main === null) {
