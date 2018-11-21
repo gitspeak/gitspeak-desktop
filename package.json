@@ -53,7 +53,8 @@
       "icon": "assets/icons/win/icon.icns"
     },
     "linux": {
-      "target": "deb"
+      "target": "deb",
+      "icon": "assets/icons/png/32x32.png"
     }
   },
   "dependencies": {
