@@ -4,11 +4,15 @@
   "productName": "GitSpeak",
   "description": "Desktop client for GitSpeak",
   "main": "main.js",
+  "author": "Sindre Aarsæther <sindre@scrimba.com> (https://gitspeak.com)",
+  "homepage": "https://gitspeak.com",
+  "email": "hello@scrimba.com",
   "scripts": {
     "start": "electron .",
     "start-dev": "open node_modules/electron/dist/Electron.app --args $PWD",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
+    "lin": "electron-builder --linux",
     "watch": "imbac -w -o lib src",
     "postinstall": "electron-builder install-app-deps",
     "gh-publish": "electron-builder --mac -p always"
@@ -22,11 +26,10 @@
     "liveshare",
     "commit"
   ],
-  "author": "Scrimba AS",
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "^3.0.9",
-    "electron-builder": "^20.34.0",
+    "electron-builder": "^20.36.2",
     "electron-packager": "^12.2.0"
   },
   "build": {
@@ -48,6 +51,9 @@
     "win": {
       "target": "NSIS",
       "icon": "assets/icons/win/icon.icns"
+    },
+    "linux": {
+      "target": "deb"
     }
   },
   "dependencies": {
