@@ -33,7 +33,7 @@
   },
   "build": {
     "appId": "com.gitspeak.app",
-    "asar": false,
+    "asar": true,
     "publish": {
       "provider": "github",
       "repo": "gitspeak-desktop",
@@ -44,19 +44,17 @@
         "dmg",
         "zip"
       ],
-      "icon": "build/icon.icns",
+      "icon": "./build/icon.icns",
       "category": "your.app.category.type"
     },
     "win": {
       "target": "NSIS",
-      "icon": "build/icon.icns"
+      "icon": "./build/icon.icns"
     },
     "linux": {
-      "target": ["AppImage", "deb"],
-      "icon": "build/icon.png",
+      "target": "deb",
       "category": "Development"
-    },
-    "deb": {}  
+    }  
   },
   "dependencies": {
     "electron-log": "^2.2.17",

@@ -159,7 +159,7 @@ async function setupApplication () {
     title: "GitSpeak",
     titleBarStyle: 'hiddenInset',
     vibrancy: null,
-    icon: path.join(__dirname,'build','icon.png'),
+    // icon: path.join(__dirname,'build','icon.png'),
     webPreferences: {
       partition: 'persist:main',
       // webSecurity: false,
