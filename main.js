@@ -8,7 +8,7 @@ const origFs = require('original-fs');
 const fixPath = require('fix-path');
 const log = require('electron-log');
 const { autoUpdater } = require("electron-updater");
-fixPath(); 
+fixPath();
 
 const {fstat} = require('./lib/fs');
 
@@ -117,7 +117,7 @@ async function setupTunnel(){
 
   process.env.TUNNEL_PORT = state.tunnelPort;
   let env = {
-    PATH: process.env.PATH, 
+    PATH: process.env.PATH,
     TUNNEL_PORT: state.tunnelPort
   };
 
@@ -127,7 +127,7 @@ async function setupTunnel(){
     silent: true
   })
 
-  tunnel.stdout.on('data', (data) => { 
+  tunnel.stdout.on('data', (data) => {
     devToolsLog(String(data));
   })
 }
@@ -158,7 +158,7 @@ async function setupApplication () {
     title: "GitSpeak",
     titleBarStyle: 'hiddenInset',
     vibrancy: null,
-    icon: path.join(__dirname, 'assets','icons','mac','icon.icns'),
+    //icon: path.join(__dirname, 'assets','icons','mac','icon.icns'),
     webPreferences: {
       partition: 'persist:main',
       // webSecurity: false,
@@ -168,8 +168,8 @@ async function setupApplication () {
       nativeWindowOpen: true,
       affinity: 'myAffinity'
     }
-  }) 
- 
+  })
+
 
 
   main.setMenu(null);
@@ -178,7 +178,7 @@ async function setupApplication () {
   devToolsLog(logQueue);
   console.log("logging!!!",logQueue);
   var doc = main.webContents;
-
+state.currentWindow.webContents.toggleDevTools()
   doc.on('will-navigate', function(event, url) {
     console.log("will navigate to",url);
     return this;
@@ -322,7 +322,7 @@ app.on('ready', setupApplication)
 // app.on('ready', setupRequestInterceptor)
 
 app.on('ready', () => {
-  autoUpdater.checkForUpdatesAndNotify();  
+  autoUpdater.checkForUpdatesAndNotify();
 })
 
 let tray = null

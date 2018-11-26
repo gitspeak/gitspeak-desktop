@@ -25,7 +25,7 @@
   "author": "Scrimba AS",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^3.0.9",
+    "electron": "^3.0.10",
     "electron-builder": "^20.34.0",
     "electron-packager": "^12.2.0"
   },
