@@ -1,6 +1,6 @@
 {
   "name": "gitspeak",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "productName": "GitSpeak",
   "description": "Desktop client for GitSpeak",
   "main": "main.js",
@@ -12,10 +12,9 @@
     "start-dev": "open node_modules/electron/dist/Electron.app --args $PWD",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
-    "lin": "electron-builder --linux",
     "watch": "imbac -w -o lib src",
     "postinstall": "electron-builder install-app-deps",
-    "gh-publish": "electron-builder --mac -p always"
+    "gh-publish": "electron-builder --linux -p always"
   },
   "repository": "https://gitspeak.com",
   "keywords": [
@@ -34,7 +33,7 @@
   },
   "build": {
     "appId": "com.gitspeak.app",
-    "asar": false,
+    "asar": true,
     "publish": {
       "provider": "github",
       "repo": "gitspeak-desktop",
@@ -45,17 +44,17 @@
         "dmg",
         "zip"
       ],
-      "icon": "assets/icons/mac/icon.icns",
+      "icon": "./build/icon.icns",
       "category": "your.app.category.type"
     },
     "win": {
       "target": "NSIS",
-      "icon": "assets/icons/win/icon.icns"
+      "icon": "./build/icon.icns"
     },
     "linux": {
       "target": "deb",
-      "icon": "assets/icons/png/32x32.png"
-    }
+      "category": "Development"
+    }  
   },
   "dependencies": {
     "electron-log": "^2.2.17",
