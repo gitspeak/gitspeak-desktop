@@ -78,7 +78,7 @@ export class FileSystem < Component
 		@extfs = extfs or fs
 		# @cwd = path.resolve(cwd)
 		@cwd = options:cwd
-		@baseRef = options:baseRef || 'head'
+		@baseRef = options:baseRef || 'HEAD'
 
 		console.log "FS mount {@cwd} {@baseRef}"
 		# difference between fully ignored files, and just eagerly loaded ones?

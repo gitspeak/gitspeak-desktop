@@ -69,7 +69,7 @@ export class Git < Component
 		@untracked = {}
 		@changed = {}
 		@objects = {}
-		@baseRef = options:baseRef or 'head'
+		@baseRef = options:baseRef or 'HEAD'
 	
 		@trees = {}
 		@trees:base = {}
@@ -199,7 +199,7 @@ export class Git < Component
 			
 			changes.push(change)
 			
-		if treeish == 'head'
+		if treeish == 'HEAD'
 			# if we are asking for the uncommitted changes we also want the added files
 			# that are not yet staged, and that are not ignored via .gitignore)
 			var toAdd = exec('ls-files --others --exclude-standard -z').toString.split('\0') # windows?
