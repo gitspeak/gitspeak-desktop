@@ -7,3 +7,4 @@ release-builds
 #files
 *.tgz
 *.log
+.DS_Store
