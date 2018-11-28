@@ -1,6 +1,6 @@
 {
   "name": "gitspeak",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "productName": "GitSpeak",
   "description": "Desktop client for GitSpeak",
   "main": "main.js",
@@ -14,9 +14,12 @@
     "dist": "electron-builder",
     "watch": "imbac -w -o lib src",
     "postinstall": "electron-builder install-app-deps",
-    "gh-publish": "electron-builder --linux -p always"
+    "gh-publish": "electron-builder --publish always"
   },
-  "repository": "https://gitspeak.com",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/scrimba/gitspeak-desktop.git"
+  },
   "keywords": [
     "git",
     "gitspeak",
