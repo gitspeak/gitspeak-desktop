@@ -9,7 +9,7 @@ const fixPath = require('fix-path');
 const log = require('electron-log');
 const { autoUpdater } = require("electron-updater");
 fixPath(); 
-console.log('process.env: ', process.env)
+
 const {fstat} = require('./lib/fs');
 
 const HOST = process.env.GSHOST || 'gitspeak.com';

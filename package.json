@@ -33,7 +33,7 @@
   },
   "build": {
     "appId": "com.gitspeak.app",
-    "asar": true,
+    "asar": false,
     "publish": {
       "provider": "github",
       "repo": "gitspeak-desktop",
