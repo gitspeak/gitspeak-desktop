@@ -18,7 +18,6 @@ const HOST = process.env.GSHOST || 'gitspeak.com';
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let main
-let ide
 let tunnel
 let state = {
   sessions: {},
@@ -136,7 +135,7 @@ async function setupTunnel(){
 function openIDE(params){
   console.log('open ide',params);
   params.port = state.tunnelPort;
-  ide.webContents.send('message',{type: 'openSession', data: params});
+  main.webContents.send('message',{type: 'openSession', data: params});
 }
 
 
@@ -205,14 +204,6 @@ async function setupApplication () {
         width: 1020,
         height: 790,
         resizable: false
-      },
-      ide: {
-        titleBarStyle: 'hiddenInset',
-        width: 1200,
-        height: 760,
-        webPreferences: {
-          preload: path.join(__dirname, 'preload.js'),
-        }
       }
     }
 
@@ -262,35 +253,6 @@ async function setupApplication () {
     // when you should delete the corresponding element.
     main = null
   })
-
-  ide = new BrowserWindow({
-    parent: main,
-    width: 1200,
-    height: 760,
-    show: false,
-    // minimizable: false,
-    // modal: true,
-    // alwaysOnTop: true,
-    maximizable: false,
-    titleBarStyle: 'hiddenInset',
-    backgroundColor: "#282f33", // "rgb(45,49,57)"
-    // acceptFirstMouse: true,
-    webPreferences: {
-      partition: 'persist:main',
-      affinity: 'myAffinity'
-      // webSecurity: false
-    }
-  });
-
-  ide.on('focus',()=> {state.currentWindow = ide})
-  ide.on('close', function(e){
-    if(ide.forceClose) return;
-    e.preventDefault();
-    ide.webContents.send('message',{type: 'close'});
-  });
-  ide.loadURL("https://" + HOST + "/ide");
-
-  ide.on('closed', function () { ide = null });
   // setTimeout(function(){
   //   openIDE({cwd: '/repos/bees', baseRef: 'head'}); // 12fb3cd
   //   ide.webContents.toggleDevTools();
@@ -378,10 +340,6 @@ app.on('before-quit', () => {
   console.log('before-quit')
   tunnel.send({type: 'kill'});
   tunnel.kill('SIGINT')
-  devToolsLog('about to forceClose ide. ide: ',ide)
-  if (ide) {
-    ide.forceClose = true;
-  }
 });
 app.on('will-quit', () => {
   console.log('will-quit')
