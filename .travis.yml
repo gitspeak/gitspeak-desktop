@@ -8,7 +8,7 @@ sudo: required
 
 # Define Node.js as the programming language as we have a web application
 language: node_js
-node_js: '8.6.0'
+node_js: '10.14.0'
 
 addons:
   chrome: stable # Install chrome stable on operating systems
