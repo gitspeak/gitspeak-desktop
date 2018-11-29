@@ -54,7 +54,12 @@
     "linux": {
       "target": "deb",
       "category": "Development"
-    }  
+    }  ,
+    "protocols": [{
+      "name": "gitspeak",
+      "role": "Viewer",
+      "schemes": ["gitspeak"]
+    }]
   },
   "dependencies": {
     "electron-log": "^2.2.17",

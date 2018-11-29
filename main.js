@@ -15,13 +15,14 @@ const {fstat} = require('./lib/fs');
 const HOST = process.env.GSHOST || 'gitspeak.com';
 // process.noAsar = true;
 
+const gotTheLock = app.requestSingleInstanceLock();
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let main
 let tunnel
+let initialUrl = '/';
 let state = {
-  sessions: {},
-  currentWindow: null,
   tunnelPort: null
 };
 var logQueue = [];
@@ -103,10 +104,15 @@ const editMenu = {
 
 var url_scheme = "gitspeak";
 protocol.registerStandardSchemes([url_scheme]);
+app.setAsDefaultProtocolClient('gitspeak');
 
 function rpc(name,...args){
   var doc = main.webContents;
   var res = doc.send('message',{type: 'rpc', data: [name,args]});
+}
+
+function send(name,args){
+  if(main && main.webContents) main.webContents.send('message',{type: name, data: args});
 }
 
 async function setupTunnel(){
@@ -174,18 +180,13 @@ async function setupApplication () {
 
   main.setMenu(null);
   state.currentWindow = main;
-  main.loadURL("https://" + HOST + "/");
+  main.loadURL("https://" + HOST + initialUrl);
   devToolsLog(logQueue);
   console.log("logging!!!",logQueue);
   var doc = main.webContents;
 
   doc.on('will-navigate', function(event, url) {
-    console.log("will navigate to",url);
     return this;
-    if (isExternal(url)) {
-        event.preventDefault();
-        openInExternalPage(url);
-    }
   });
 
   doc.on('new-window', (event, url, frameName, disposition, options, additionalFeatures) => {
@@ -233,26 +234,25 @@ async function setupApplication () {
       );
 
       event.newGuest = new BrowserWindow(options)
-      event.newGuest.on('focus',()=> {state.currentWindow = event.newGuest});
+      // event.newGuest.on('focus',()=> {state.currentWindow = event.newGuest});
     }
   })
 
-  main.on('focus',() => {state.currentWindow = main})
+  // main.on('focus',() => {
+  //   state.currentWindow = main;
+  // })
 
   main.on('close', (e) => {
+    if(main.forceClose) return;
     e.preventDefault();
-    console.log('main close')
     main.hide();
   })
 
   // Emitted when the window is closed.
   main.on('closed', function () {
-    console.log('closed!! ')
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    main = null
+    main = null;
   })
+
   // setTimeout(function(){
   //   openIDE({cwd: '/repos/bees', baseRef: 'head'}); // 12fb3cd
   //   ide.webContents.toggleDevTools();
@@ -295,49 +295,18 @@ app.on('ready', () => {
   autoUpdater.checkForUpdatesAndNotify();  
 })
 
-let tray = null
-app.on('ready', () => {
-  // Create app menu
-  let appMenu = Menu.buildFromTemplate([{
-    label: "GitSpeak",
-    submenu: [
-      {role: 'quit'}
-    ]
-  },{
-    label: "File",
-    submenu: [
-      {
-        label: 'Open Directory...',
-        click(){ console.log("clicked!!"); }
-      }
-    ]
-  },editMenu,{
-    label: "Develop",
-    submenu: [{
-      label: "Sync GitHub",
-      click(){ rpc('syncGitHub'); } // create separate rpc method?
-    }]
-  },{
-    label: "Help",
-    submenu: [{
-      label: "Toggle Developer Tools",
-      click(){ state.currentWindow.webContents.toggleDevTools(); }
-    }]
-  }])
-
-  Menu.setApplicationMenu(appMenu);
-
-  protocol.registerHttpProtocol(url_scheme, (request, callback) => {
-    console.log("here1");
-  }, (error) => {
-    console.log("here2");
-    if (!error) console.error('Failed to register protocol')
-  });
-
-});
+app.on('open-url', (event,url) => {
+  if(main && main.webContents){
+    devToolsLog("trying to open url through application! " + url);
+    send('openUrl',url);
+  } else {
+    initialUrl = url.slice(10);
+  }
+})
 
 app.on('before-quit', () => {
   console.log('before-quit')
+  if(main) main.forceClose = true;
   tunnel.send({type: 'kill'});
   tunnel.kill('SIGINT')
 });
@@ -360,13 +329,15 @@ app.on('window-all-closed', function () {
 })
 
 app.on('activate', function () {
-  main.show();
+  
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (main === null) {
     // should not be possible(!)
     // createWindow()
-  }
+  } else {
+    main.show();
+  } 
 })
 
 // In this file you can include the rest of your app's specific main process
