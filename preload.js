@@ -12,8 +12,9 @@ window.interop = {
   },
 
   selectDirectory() {
-  	var res = remote.dialog.showOpenDialog({
-  		title: "Choose directory...",
+  	var res = remote.dialog.showOpenDialog(remote.getCurrentWindow(),{
+  		title: "Open folder...",
+      message: "Open folder...",
 		  properties: ['openDirectory']
   	});
   	return res && res[0];
