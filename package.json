@@ -13,6 +13,7 @@
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "watch": "imbac -w -o lib src",
+    "compile": "rimraf app/out && tsc",
     "release": "yarn compile && electron-builder",
     "postinstall": "electron-builder install-app-deps",
     "gh-publish": "electron-builder --publish --mlw always",
