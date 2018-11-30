@@ -48,4 +48,4 @@ script:
 #  - if [[ "$TRAVIS_BRANCH" == "master" ]] && [[ "$TRAVIS_OS_NAME" == "win" ]]; then yarn gh-release:win; fi
 
   - echo "Deploy mac version to GitHub"
-  - if [[ "$TRAVIS_BRANCH" == "master" ]] && [[ "$TRAVIS_OS_NAME" == "osx" ]]; then yarn gh-release:mac; fi
+  - if [[ "$TRAVIS_BRANCH" == "master" ]] && [[ "$TRAVIS_OS_NAME" == "osx" ]]; then yarn gh-publish:mac; fi
