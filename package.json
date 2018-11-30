@@ -13,8 +13,9 @@
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "watch": "imbac -w -o lib src",
+    "release": "yarn compile && electron-builder",
     "postinstall": "electron-builder install-app-deps",
-    "gh-publish": "electron-builder --publish always",
+    "gh-publish": "electron-builder --publish --mlw always",
     "gh-publish:mac": "electron-builder --mac --publish always",
     "gh-publish:win": "electron-builder --win --publish always",
     "gh-publish:linux": "electron-builder --linux --publish always"
