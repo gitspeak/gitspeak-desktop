@@ -103,13 +103,13 @@
 
 ## FROM ISSUE: https://github.com/electron-userland/electron-builder/issues/1751
 
-osx_image: xcode8.3
+osx_image: xcode10.1
 
 dist: trusty
 sudo: false
 
 language: node_js
-node_js: "10"
+node_js: "10.14.1"
 
 env:
   global:
