@@ -1,7 +1,7 @@
 // ==============
 // Preload script
 // ==============
-const {remote,ipcRenderer} = require('electron');
+const {remote,ipcRenderer,shell} = require('electron');
 	
 const machine = remote.require('./machine')
 
@@ -36,6 +36,10 @@ window.interop = {
   	send(channel,args){
   		ipcRenderer.send(channel,args);
   	},
+
+    openExternal(url){
+      shell.openExternal(url);
+    },
 
     getSync(key){
       return ipcRenderer.sendSync('state.get',key)

@@ -1,7 +1,7 @@
 // Modules to control application life and create native browser window
 const path = require('path')
 var fp = require("find-free-port")
-const {app, BrowserWindow,Tray,Menu,session, protocol,ipcMain, clipboard} = require('electron')
+const {app, BrowserWindow,Tray,Menu,session, protocol,ipcMain, clipboard, shell} = require('electron')
 const fs = require('fs');
 const cp = require('child_process');
 const origFs = require('original-fs');
@@ -208,6 +208,11 @@ async function setupApplication () {
       }
     }
 
+    if(frameName == 'ghlogin'){
+      shell.openExternal(url);
+      return;
+    }
+
     if (true) {
       event.preventDefault()
       var frameDefaults = defaults[frameName] || {};
@@ -297,7 +302,7 @@ app.on('ready', () => {
 
 app.on('open-url', (event,url) => {
   if(main && main.webContents){
-    devToolsLog("trying to open url through application! " + url);
+    console.log("trying to open url through application! " + url);
     send('openUrl',url);
   } else {
     initialUrl = url.slice(10);
