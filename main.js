@@ -11,6 +11,8 @@ const { autoUpdater } = require("electron-updater");
 fixPath(); 
 
 const {fstat} = require('./lib/fs');
+console.log('process.env.GSHOST:', process.env.GSHOST)
+console.log('process.env.GH_TOKEN:', process.env.GH_TOKEN)
 
 const HOST = process.env.GSHOST || 'gitspeak.com';
 // process.noAsar = true;
