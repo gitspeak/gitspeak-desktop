@@ -38,7 +38,7 @@ export def getGitBlob cwd, sha
 	return obj
 
 export def getGitTree cwd, sha
-	let buffer = cp.execSync('git ls-tree ' + sha + ' -z -l', cwd: cwd, env: process:env)
+	let buffer = cp.execSync('git ls-tree -z -l ' + sha, cwd: cwd, env: process:env)
 	let tree = []
 	for line in buffer.toString.split('\0')
 		let [mode,type,sha,osize] = line.split(/(?:\ |\t)+/g)
