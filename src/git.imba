@@ -25,7 +25,28 @@ var FLAGS =
 	"D": 1024
 	"R": 256
 	"?": 2
-	
+
+export def getGitBlob cwd, sha
+	let buffer = cp.execSync('git cat-file -p ' + sha, cwd: cwd, env: process:env)
+	let obj = {
+		oid: sha
+		body: null
+		size: buffer:length
+	}
+	if !ibn.sync(buffer,obj:size) and obj:size < 200000 
+		obj:body = buffer.toString
+	return obj
+
+export def getGitTree cwd, sha
+	let buffer = cp.execSync('git ls-tree ' + sha + ' -z -l', cwd: cwd, env: process:env)
+	let tree = []
+	for line in buffer.toString.split('\0')
+		let [mode,type,sha,osize] = line.split(/(?:\ |\t)+/g)
+		let name = line.substr(line.indexOf('\t') + 1)
+		continue unless name
+		tree.push({sha: sha,size: osize, mode: mode, path: name, type: type})
+	return {data: {nodes: tree}}
+
 export def getGitInfo cwd
 	var data = {}
 	if var repo = gitRepoInfo._findRepo(cwd)

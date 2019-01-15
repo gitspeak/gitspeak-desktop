@@ -61,7 +61,15 @@ window.interop = {
 
     setBadgeCount(count) {
       return remote.app.setBadgeCount(count);
-    }
+    },
+
+    getGitBlob(localDirectory, sha) {
+      return machine.getGitBlob(localDirectory, sha)
+    },
+  
+    getGitTree(localDirectory, sha) {
+      return machine.getGitTree(localDirectory, sha)
+    },
   },
 
   win: remote.getCurrentWindow()
