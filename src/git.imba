@@ -27,25 +27,32 @@ var FLAGS =
 	"?": 2
 
 export def getGitBlob cwd, sha
-	let buffer = cp.execSync('git cat-file -p ' + sha, cwd: cwd, env: process:env)
-	let obj = {
-		oid: sha
-		body: null
-		size: buffer:length
-	}
-	if !ibn.sync(buffer,obj:size) and obj:size < 200000 
-		obj:body = buffer.toString
-	return obj
+	try
+		let buffer = cp.execSync('git cat-file -p ' + sha, cwd: cwd, env: process:env)
+		let obj = {
+			oid: sha
+			body: null
+			size: buffer:length
+		}
+		if !ibn.sync(buffer,obj:size) and obj:size < 200000 
+			obj:body = buffer.toString
+		return obj
+	catch error
+		return null
 
 export def getGitTree cwd, sha
-	let buffer = cp.execSync('git ls-tree ' + sha + ' -z -l', cwd: cwd, env: process:env)
-	let tree = []
-	for line in buffer.toString.split('\0')
-		let [mode,type,sha,osize] = line.split(/(?:\ |\t)+/g)
-		let name = line.substr(line.indexOf('\t') + 1)
-		continue unless name
-		tree.push({sha: sha,size: osize, mode: mode, path: name, type: type})
-	return {data: {nodes: tree}}
+	try
+		let buffer = cp.execSync('git ls-tree -z -l ' + sha, cwd: cwd, env: process:env)
+		let tree = []
+		for line in buffer.toString.split('\0')
+			let [mode,type,sha,osize] = line.split(/(?:\ |\t)+/g)
+			let name = line.substr(line.indexOf('\t') + 1)
+			continue unless name
+			tree.push({sha: sha,size: osize, mode: mode, path: name, type: type})
+		return {data: {nodes: tree}}
+	catch error
+		return null
+	
 
 export def getGitInfo cwd
 	var data = {}
