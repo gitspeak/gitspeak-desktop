@@ -11,12 +11,13 @@ window.interop = {
     return machine.getGitInfo(dir);
   },
 
-  selectDirectory() {
-  	var res = remote.dialog.showOpenDialog(remote.getCurrentWindow(),{
-  		title: "Open folder...",
+  selectDirectory(o) {
+    var opts = Object.assign({
+      title: "Open folder...",
       message: "Open folder...",
-		  properties: ['openDirectory']
-  	});
+      properties: ['openDirectory']
+    },o || {});
+  	var res = remote.dialog.showOpenDialog(remote.getCurrentWindow(),opts);
   	return res && res[0];
   },
 
