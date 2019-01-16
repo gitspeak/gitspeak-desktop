@@ -3,9 +3,9 @@ image: Visual Studio 2017
 environment:
   nodejs_version: "10"
 
-# Post-install test scripts.
+# Post-install test scripts
 test_script:
-  # Output useful info for debugging.
+  # Output useful info for debugging
   - node --version
   - npm --version
   # run tests
