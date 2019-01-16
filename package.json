@@ -21,8 +21,8 @@
     "gh-publish:linux": "electron-builder --linux --publish always"
   },
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/scrimba/gitspeak-desktop.git"
+    "type": "git",
+    "url": "https://github.com/scrimba/gitspeak-desktop.git"
   },
   "keywords": [
     "git",
@@ -61,7 +61,7 @@
     "linux": {
       "target": "deb",
       "category": "Development"
-    }  ,
+    },
     "protocols": [{
       "name": "gitspeak",
       "role": "Viewer",
