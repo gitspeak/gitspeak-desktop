@@ -26,11 +26,10 @@ var FLAGS =
 	"R": 256
 	"?": 2
 
-var valid = do | str |
+def valid str
 	return str.match(/^[a-z0-9]+$/)
 
-var tryFetch = do |cwd, sha, type|
-	console.log 'tryFetch'
+def tryFetch cwd, sha, type
 	cp.execSync('git fetch', cwd: cwd, env: process:env)
 	if type == 'tree'
 		return getGitTree cwd, sha, yes
@@ -39,7 +38,7 @@ var tryFetch = do |cwd, sha, type|
 
 export def getGitBlob cwd, sha, returnAnyway = no
 	unless valid sha
-		return "Not a valid sha"
+		return null
 	try
 		let buffer = cp.execSync('git cat-file -p ' + sha, cwd: cwd, env: process:env)
 		let obj = {
@@ -57,9 +56,8 @@ export def getGitBlob cwd, sha, returnAnyway = no
 			return tryFetch cwd, sha, 'blob'
 
 export def getGitTree cwd, sha, returnAnyway = no
-	console.log '--------- getGitTree'
 	unless valid sha
-		return "Not a valid sha"
+		return null
 	try
 		let buffer = cp.execSync('git ls-tree -z -l ' + sha, cwd: cwd, env: process:env)
 		let tree = []
