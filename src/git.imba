@@ -26,7 +26,20 @@ var FLAGS =
 	"R": 256
 	"?": 2
 
-export def getGitBlob cwd, sha
+var valid = do | str |
+	return str.match(/^[a-z0-9]+$/)
+
+var tryFetch = do |cwd, sha, type|
+	console.log 'tryFetch'
+	cp.execSync('git fetch', cwd: cwd, env: process:env)
+	if type == 'tree'
+		return getGitTree cwd, sha, yes
+	elif type == 'blob'
+		return getGitBlob cwd, sha, yes
+
+export def getGitBlob cwd, sha, returnAnyway = no
+	unless valid sha
+		return "Not a valid sha"
 	try
 		let buffer = cp.execSync('git cat-file -p ' + sha, cwd: cwd, env: process:env)
 		let obj = {
@@ -38,9 +51,15 @@ export def getGitBlob cwd, sha
 			obj:body = buffer.toString
 		return obj
 	catch error
-		return null
+		if returnAnyway
+			return null
+		else
+			return tryFetch cwd, sha, 'blob'
 
-export def getGitTree cwd, sha
+export def getGitTree cwd, sha, returnAnyway = no
+	console.log '--------- getGitTree'
+	unless valid sha
+		return "Not a valid sha"
 	try
 		let buffer = cp.execSync('git ls-tree -z -l ' + sha, cwd: cwd, env: process:env)
 		let tree = []
@@ -51,7 +70,10 @@ export def getGitTree cwd, sha
 			tree.push({sha: sha,size: osize, mode: mode, path: name, type: type})
 		return {data: {nodes: tree}}
 	catch error
-		return null
+		if returnAnyway
+			return null
+		else
+			tryFetch cwd, sha, 'tree'
 	
 
 export def getGitInfo cwd
@@ -126,6 +148,7 @@ export class Git < Component
 		self
 
 	def exec cmd
+		# todo: add check
 		cp.execSync('git ' + cmd, cwd: cwd, env: process:env)
 
 	def isRepository
@@ -168,6 +191,7 @@ export class Git < Component
 		return @tree
 	
 	def cat oid
+		# todo: add check
 		var res = exec('cat-file -p ' + oid)
 		return res
 		
@@ -203,6 +227,7 @@ export class Git < Component
 		# to ensure git recalculates before diff-index
 		exec('status')
 		
+		# todo: add check
 		var raw = exec('diff-index -z ' + treeish).toString
 		var nullOid = "0000000000000000000000000000000000000000"
 		for line in raw.split('\0:')
@@ -250,6 +275,7 @@ export class Git < Component
 		
 	# def isIgnored src
 	def refreshUntrackedFiles dir = ''
+		# todo: add check
 		var paths = exec('ls-files --others --exclude-standard -z ' + dir).toString.split('\0')
 		var tree = tree
 		for path in paths when path
