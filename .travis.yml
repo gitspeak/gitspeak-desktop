@@ -137,7 +137,7 @@ install:
 
 script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then yarn release; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then yarn release -- --mac; fi
+  # - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then yarn release -- --mac; fi
 
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
@@ -151,7 +151,7 @@ deploy:
   api_key: "$GH_TOKEN"
   skip_cleanup: true
   file: "dist/GitSpeak-0.0.8.dmg"
-  draft: trues
+  draft: true
   on:
     branch: release
 
