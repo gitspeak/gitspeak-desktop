@@ -26,6 +26,62 @@ var FLAGS =
 	"R": 256
 	"?": 2
 
+export def exec command, cwd
+	cp.execSync(command, cwd: cwd, env: process:env)
+
+###
+--raw --numstat
+:100644 100644 06f59bf... 98ad458... M  README.md
+:100644 100644 5474c93... 801afcc... M  server.js
+:000000 100644 0000000... 3760da4... A  src/api.imba
+:100644 100644 b116b25... cfee64d... M  src/main.imba
+:000000 100644 0000000... 698007b... A  www/playground.js
+7       1       README.md
+1       1       server.js
+4       0       src/api.imba
+9       1       src/main.imba
+1       0       www/playground.js
+###
+export def getGitDiff cwd, base, head, includePatch = no
+	let result = {
+		head: head
+		base: base
+		diff: []
+	}
+
+	let raw = exec("git diff --raw --numstat {base}..{head}",cwd).toString
+	let lines = raw.split('\n')
+	let len = Math.floor(lines:length * 0.5)
+	let numstat = lines.splice(len,len + 2).map do |ln|
+		ln.split(/\s+/).map do |item| (/^\d+$/).test(item) ? parseInt(item) : item
+
+
+
+	for entry,i in lines
+		let mode = entry.split(/[\s\t]/)[4]
+		let file = entry.slice(entry.indexOf('\t') + 1)
+		let node = {
+			name: file,
+			mode: mode,
+			ins: numstat[i][0]
+			rem: numstat[i][1]
+		}
+
+		if includePatch
+			let body = exec("git cat-file -p {head}:{file}",cwd).toString
+			node:body = body
+			if mode == 'A'
+				# just add the body
+				node:body = body
+			elif mode == 'M'
+				let patch = exec("git diff {base}..{head} {file}",cwd).toString
+				node:patch = patch
+
+		result:diff.push node
+
+	return result
+
+
 def valid str
 	return str.match(/^[a-z0-9]+$/)
 

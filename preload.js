@@ -72,6 +72,10 @@ window.interop = {
       console.log('YES ABOUT TO CALL getGitTree!!!!!!!!!!')
       return machine.getGitTree(localDirectory, sha)
     },
+
+    getGitDiff(localDirectory, base, head, includePatch) {
+      return machine.getGitDiff(localDirectory, base, head, includePatch)
+    },
   },
 
   win: remote.getCurrentWindow()
