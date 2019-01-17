@@ -44,6 +44,9 @@ export def fetchSha cwd, sha, ref
 
 	return yes
 
+export def isValidTreeish value
+	return value.match(/^[\:\/\-\.\w]+$/)
+
 ###
 --raw --numstat
 :100644 100644 06f59bf... 98ad458... M  README.md
@@ -58,7 +61,7 @@ export def fetchSha cwd, sha, ref
 1       0       www/playground.js
 ###
 export def getGitDiff cwd, base, head, includePatch = no
-	
+
 	let result = {
 		head: head
 		base: base
@@ -98,29 +101,33 @@ export def getGitDiff cwd, base, head, includePatch = no
 	return result
 
 
-def valid str
-	return str.match(/^[a-z0-9]+$/)
-
 export def getGitBlob cwd, sha, refToFetch
-	return null unless valid(sha)
+	console.log "getGitBlob",cwd,sha,refToFetch
+	unless isValidTreeish(sha)
+		console.log "blob did not exist??",cwd,sha
+		return null 
 	# make sure we've fetched latest from remote
 	fetchSha(cwd,sha,refToFetch)
 
 	try
 		let buffer = cp.execSync('git cat-file -p ' + sha, cwd: cwd, env: process:env)
+		# not certain that we have the oid?
 		let obj = {
 			oid: sha
 			body: null
 			size: buffer:length
+			type: 'blob'
 		}
 		if !ibn.sync(buffer,obj:size) and obj:size < 200000 
 			obj:body = buffer.toString
 		return obj
 	catch error
+		console.log "error from getGitBlob"
 		return null
 
 export def getGitTree cwd, sha, refToFetch
-	return null unless valid(sha)
+	console.log "getGitTree",cwd,sha,refToFetch
+	return null unless isValidTreeish(sha)
 
 	fetchSha(cwd,sha,refToFetch)
 
@@ -132,7 +139,11 @@ export def getGitTree cwd, sha, refToFetch
 			let name = line.substr(line.indexOf('\t') + 1)
 			continue unless name
 			tree.push({sha: sha,size: osize, mode: mode, path: name, type: type})
-		return {data: {nodes: tree}}
+		return {
+			oid: sha
+			type: 'tree'
+			data: { nodes: tree }
+		}
 	catch error
 		return null
 
