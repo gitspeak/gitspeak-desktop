@@ -1,6 +1,6 @@
 {
   "name": "gitspeak",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "productName": "GitSpeak",
   "description": "Desktop client for GitSpeak",
   "main": "main.js",
@@ -37,11 +37,6 @@
   "build": {
     "appId": "com.gitspeak.app",
     "asar": false,
-    "publish": {
-      "provider": "github",
-      "repo": "gitspeak-desktop",
-      "owner": "scrimba"
-    },
     "mac": {
       "target": [
         "dmg",
