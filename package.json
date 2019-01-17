@@ -14,11 +14,7 @@
     "dist": "electron-builder",
     "watch": "imbac -w -o lib src",
     "release": "electron-builder",
-    "postinstall": "electron-builder install-app-deps",
-    "gh-publish": "electron-builder --publish --mlw always",
-    "gh-publish:mac": "electron-builder --mac --publish always",
-    "gh-publish:win": "electron-builder --win --publish always",
-    "gh-publish:linux": "electron-builder --linux --publish always"
+    "postinstall": "electron-builder install-app-deps"
   },
   "repository": {
     "type": "git",
