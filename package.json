@@ -12,6 +12,7 @@
     "start-dev": "open node_modules/electron/dist/Electron.app --args $PWD",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
+    "build": "electron-builder",
     "watch": "imbac -w -o lib src",
     "release": "electron-builder",
     "postinstall": "electron-builder install-app-deps"
