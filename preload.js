@@ -69,6 +69,7 @@ window.interop = {
     },
   
     getGitTree(localDirectory, sha) {
+      console.log('YES ABOUT TO CALL getGitTree!!!!!!!!!!')
       return machine.getGitTree(localDirectory, sha)
     },
   },
