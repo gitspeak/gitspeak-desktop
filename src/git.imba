@@ -29,6 +29,21 @@ var FLAGS =
 export def exec command, cwd
 	cp.execSync(command, cwd: cwd, env: process:env)
 
+export def shaExists cwd, treeish
+	try
+		exec("git cat-file -t {treeish}",cwd)
+		return yes
+	catch e
+		return no
+
+export def fetchSha cwd, sha, ref
+	return yes if shaExists(cwd,sha)
+
+	let cmd = ref ? "git fetch origin {ref}" : "git fetch"
+	let res = exec(cmd,cwd)
+
+	return yes
+
 ###
 --raw --numstat
 :100644 100644 06f59bf... 98ad458... M  README.md
@@ -43,6 +58,7 @@ export def exec command, cwd
 1       0       www/playground.js
 ###
 export def getGitDiff cwd, base, head, includePatch = no
+	
 	let result = {
 		head: head
 		base: base
@@ -85,16 +101,11 @@ export def getGitDiff cwd, base, head, includePatch = no
 def valid str
 	return str.match(/^[a-z0-9]+$/)
 
-def tryFetch cwd, sha, type
-	cp.execSync('git fetch', cwd: cwd, env: process:env)
-	if type == 'tree'
-		return getGitTree cwd, sha, yes
-	elif type == 'blob'
-		return getGitBlob cwd, sha, yes
+export def getGitBlob cwd, sha, refToFetch
+	return null unless valid(sha)
+	# make sure we've fetched latest from remote
+	fetchSha(cwd,sha,refToFetch)
 
-export def getGitBlob cwd, sha, returnAnyway = no
-	unless valid sha
-		return null
 	try
 		let buffer = cp.execSync('git cat-file -p ' + sha, cwd: cwd, env: process:env)
 		let obj = {
@@ -106,14 +117,13 @@ export def getGitBlob cwd, sha, returnAnyway = no
 			obj:body = buffer.toString
 		return obj
 	catch error
-		if returnAnyway
-			return null
-		else
-			return tryFetch cwd, sha, 'blob'
-
-export def getGitTree cwd, sha, returnAnyway = no
-	unless valid sha
 		return null
+
+export def getGitTree cwd, sha, refToFetch
+	return null unless valid(sha)
+
+	fetchSha(cwd,sha,refToFetch)
+
 	try
 		let buffer = cp.execSync('git ls-tree -z -l ' + sha, cwd: cwd, env: process:env)
 		let tree = []
@@ -124,11 +134,7 @@ export def getGitTree cwd, sha, returnAnyway = no
 			tree.push({sha: sha,size: osize, mode: mode, path: name, type: type})
 		return {data: {nodes: tree}}
 	catch error
-		if returnAnyway
-			return null
-		else
-			tryFetch cwd, sha, 'tree'
-	
+		return null
 
 export def getGitInfo cwd
 	var data = {}

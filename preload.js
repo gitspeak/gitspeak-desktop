@@ -64,18 +64,18 @@ window.interop = {
       return remote.app.setBadgeCount(count);
     },
 
-    getGitBlob(localDirectory, sha) {
-      return machine.getGitBlob(localDirectory, sha)
+    getGitBlob(localDirectory, sha, refToFetch) {
+      return machine.getGitBlob(localDirectory, sha, refToFetch)
     },
   
-    getGitTree(localDirectory, sha) {
+    getGitTree(localDirectory, sha, refToFetch) {
       console.log('YES ABOUT TO CALL getGitTree!!!!!!!!!!')
-      return machine.getGitTree(localDirectory, sha)
+      return machine.getGitTree(localDirectory, sha, refToFetch)
     },
 
     getGitDiff(localDirectory, base, head, includePatch) {
       return machine.getGitDiff(localDirectory, base, head, includePatch)
-    },
+    }
   },
 
   win: remote.getCurrentWindow()
