@@ -145,3 +145,12 @@ before_cache:
 branches:
   except:
     - "/^v\\d+\\.\\d+\\.\\d+$/"
+
+deploy:
+  provider: releases
+  api_key: "$GH_TOKEN"
+  skip_cleanup: true
+  file: "GitSpeak-0.0.8.dmg"
+  on:
+    branch: release 
+
