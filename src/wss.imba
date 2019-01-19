@@ -4,6 +4,7 @@ var WebSocket = require 'ws'
 
 import {Terminal} from './terminal'
 import {FileSystem} from './fs'
+import {Git,GitRepo} from './git'
 
 class SocketClient
 	prop ws
@@ -47,7 +48,16 @@ class FileSystemClient < SocketClient
 			log 'fs',type,params
 			send([type,params])
 		widget.start
-	
+
+class RepoClient < SocketClient
+
+	def setup opts
+		widget = GitRepo.new(self,opts:cwd,opts)
+		widget.on('all') do |type, params|
+			log 'ws.git',type,params
+			send([type,params])
+		widget.start
+
 export class SocketServer
 	
 	def initialize
@@ -82,6 +92,8 @@ export class SocketServer
 					TerminalClient.new(ws,opts)
 				elif opts:type == 'fs'
 					FileSystemClient.new(ws,opts)
+				elif opts:type == 'repo'
+					RepoClient.new(ws,opts)
 			catch e
 				log "error",e:message
 		return

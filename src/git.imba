@@ -7,6 +7,7 @@ var gitRepoInfo = require 'git-repo-info'
 var cp = require 'child_process'
 var ibn = require 'isbinaryfile'
 
+var LINESEP = '\n'
 var FLAGS =
 	UNSAVED: 1
 	UNTRACKED: 2
@@ -38,7 +39,6 @@ export def shaExists cwd, treeish
 
 export def fetchSha cwd, sha, ref
 	return yes if shaExists(cwd,sha)
-
 	let cmd = ref ? "git fetch origin {ref}" : "git fetch"
 	let res = exec(cmd,cwd)
 
@@ -373,3 +373,62 @@ export class Git < Component
 			term.write("cd {cwd}\n")
 			term.write(cmd + '\n')
 		self
+
+export class GitRepo < Git
+
+	def initialize owner, root, options = {}
+		@owner = owner
+		@root = root
+		@summary = {}
+		@intervals = {}
+		@refs = {}
+		if var repo = gitRepoInfo._findRepo(cwd)
+			var info = gitRepoInfo(cwd)
+			@summary:branch = info:branch
+			@summary:sha = info:sha
+			@summary:tag = info:tag
+			@summary:commit = info:commitMessage
+			@summary:root = info:root
+			log "GIT",info
+
+		
+		if var conf = parseGitConfig.sync(cwd: cwd, path: cwd + '/.git/config')
+			log "GITCONF",cwd,conf
+			let branchInfo = exec("branch -vv --no-abbrev --no-color").toString
+			let [m,name,head,remote] = branchInfo.match(/\* (\w+)\s+([a-f\d]+)\s(?:\[([^\]]+)\])?/)
+			@summary:remote = remote
+
+			if let origin = conf['remote "origin"']
+				self.origin = @summary:origin = origin:url
+		self
+
+	def start
+		emit('start',@summary)
+		# need to get noticed when tunnel is stopped
+		@intervals:fetch = setInterval(self:fetch.bind(self),10000)
+		sendRefs
+		self
+
+	def sendRefs
+		# only send changed refs
+		let refs = {}
+		let rawRefs = exec('show-ref').toString
+		for line in rawRefs.split(LINESEP)
+			var [sha,ref] = line.split(" ")
+			refs[ref] = sha
+		emit('refs',refs)
+		self
+
+	def fetch
+		return if @fetching
+		emit('fetching',@fetching = yes)
+		try
+			var res = exec('fetch -a origin "refs/pull/*:refs/pull/*"').toString
+			console.log "result is",res
+			# if there is a result - some branches may have updated -- send new refs
+			sendRefs if res and String(res):length > 2
+
+		catch e
+			self
+		emit('fetched',@fetching = no)
+		return
