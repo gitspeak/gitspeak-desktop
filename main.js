@@ -261,50 +261,6 @@ async function setupApplication () {
     main = null;
   })
 
-  // NOTIFICATION STUFF - EXPERIMENTS
-
-  console.log('Notification: ', Notification)
-  console.log('Notification.permission: ', Notification.permission)
-  console.log('Notification.isSupported(): ',  Notification.isSupported())
-
-
-  // this doesn't work right now, why? I think I got it to work once
-  var notif = new Notification({
-    title: "Checking for updates",
-    body: "stuff",
-  })
-  console.log('notif: ', notif)
-  notif.show()
-  notif.on('show', () => {
-    console.log('notif show emitted')
-  })
-
-  notif.on('close', () => {
-    console.log('notif close emitted')
-  })
-
-  notif.on('action', () => {
-    console.log('notif action emitted')
-  })
-
-  notif.on('reply', () => {
-    console.log('notif reply emitted')
-  })
-
-  // var notif2 = new Notification({
-  //   title: "Checking for updates 2",
-  //   body: "stuff"
-  // })
-
-  // console.log('notif2: ', notif2)
-  var iconpath = path.join(__dirname,'build','icon.png');
-
-  // notifier.notify({
-  //   title: 'My notification',
-  //   message: 'Hello, there!',
-  //   icon: iconpath
-  // });
-
   // setTimeout(function(){
   //   openIDE({cwd: '/repos/bees', baseRef: 'head'}); // 12fb3cd
   //   ide.webContents.toggleDevTools();

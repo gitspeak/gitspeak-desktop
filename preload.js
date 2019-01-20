@@ -2,7 +2,7 @@
 // Preload script
 // ==============
 const {remote,ipcRenderer,shell} = require('electron');
-	
+
 const machine = remote.require('./machine')
 
 window.interop = {
@@ -69,13 +69,16 @@ window.interop = {
     },
   
     getGitTree(localDirectory, sha, refToFetch) {
-      console.log('YES ABOUT TO CALL getGitTree!!!!!!!!!!')
       return machine.getGitTree(localDirectory, sha, refToFetch)
     },
 
     getGitDiff(localDirectory, base, head, includePatch) {
       return machine.getGitDiff(localDirectory, base, head, includePatch)
-    }
+    },
+
+    sendNotification(data){
+      new machine.Notification(data).show();
+    },
   },
 
   win: remote.getCurrentWindow()
