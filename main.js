@@ -1,14 +1,16 @@
 // Modules to control application life and create native browser window
 const path = require('path')
 var fp = require("find-free-port")
-const {app, BrowserWindow,Tray,Menu,session, protocol,ipcMain, clipboard, shell} = require('electron')
+const {app, BrowserWindow,Tray,Menu,session, protocol,ipcMain, clipboard, shell, Notification} = require('electron')
 const fs = require('fs');
 const cp = require('child_process');
 const origFs = require('original-fs');
 const fixPath = require('fix-path');
 const log = require('electron-log');
 const { autoUpdater } = require("electron-updater");
-fixPath(); 
+fixPath();
+const notifier = require('node-notifier');
+
 
 const {fstat} = require('./lib/fs');
 console.log('process.env.GSHOST:', process.env.GSHOST)
@@ -176,8 +178,7 @@ async function setupApplication () {
       nativeWindowOpen: true,
       affinity: 'myAffinity'
     }
-  }) 
- 
+  })
 
 
   main.setMenu(null);
