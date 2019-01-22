@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>GitSpeak</title>
+    <style>
+    html,body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
+    }
+      body {
+        -webkit-app-region: drag;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        -webkit-user-select: none;
+        cursor: default;
+        color: #c2c4ce;
+        font-size: 16px;
+      }
+      div.logo {
+        width: 320px;
+        height: 100px;
+        background: url(logo.svg) no-repeat center center;
+        background-size: contain;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='logo'></div>
+    <span>Starting up...</span>
+    <!-- All of the Node.js APIs are available in this renderer process. -->
+  </body>
+</html>

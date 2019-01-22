@@ -24,6 +24,7 @@ const gotTheLock = app.requestSingleInstanceLock();
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let main
+let splash
 let tunnel
 let initialUrl = '/';
 let state = {
@@ -159,6 +160,35 @@ function devToolsLog(s) {
 }
 
 async function setupApplication () {
+  let opts = {
+    width: 420,
+    height: 280,
+    title: "GitSpeak",
+    titleBarStyle: 'hidden',
+    hasShadow: false,
+    vibrancy: null,
+    center: true,
+    movable: false,
+    resizable: false,
+    minimizable: false,
+    maximizable: false,
+    closable: false,
+    alwaysOnTop: true,
+    show: false
+  }
+
+  // Create loading-screen that will show until we have loaded GitSpeak
+  splash = new BrowserWindow(Object.assign({
+
+  },opts));
+
+  splash.once('ready-to-show', function(event, url) {
+    splash.show();
+    return this;
+  });
+
+  splash.loadURL(`file://${__dirname}/splash.html`);
+
   await setupTunnel();
 
   // Create the browser window.
@@ -168,24 +198,32 @@ async function setupApplication () {
     title: "GitSpeak",
     titleBarStyle: 'hiddenInset',
     vibrancy: null,
-    // icon: path.join(__dirname,'build','icon.png'),
+    show: false,
     webPreferences: {
       partition: 'persist:main',
       // webSecurity: false,
       preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: true,
+      nodeIntegration: true, // should be disabled?
       contextIsolation: false,
       nativeWindowOpen: true,
+      backgroundThrottling: false,
       affinity: 'myAffinity'
     }
   })
-
 
   main.setMenu(null);
   state.currentWindow = main;
   main.loadURL("https://" + HOST + initialUrl);
   devToolsLog(logQueue);
-  console.log("logging!!!",logQueue);
+
+  main.on('show',function(event){
+    if(splash){
+      splash.hide();
+      splash.destroy();
+      splash = null;
+    }
+  });
+
   var doc = main.webContents;
 
   doc.on('will-navigate', function(event, url) {
@@ -198,18 +236,7 @@ async function setupApplication () {
     var outerPos = main.getPosition();
     var outerSize = main.getSize();
 
-    var defaults = {
-      ghlogin: {
-        width: 400,
-        height: 540,
-        resizable: false
-      },
-      ghapp: {
-        width: 1020,
-        height: 790,
-        resizable: false
-      }
-    }
+    var defaults = {}
 
     if(frameName == 'ghlogin'){
       shell.openExternal(url);
@@ -246,10 +273,6 @@ async function setupApplication () {
     }
   })
 
-  // main.on('focus',() => {
-  //   state.currentWindow = main;
-  // })
-
   main.on('close', (e) => {
     if(main.forceClose) return;
     e.preventDefault();
@@ -260,16 +283,28 @@ async function setupApplication () {
   main.on('closed', function () {
     main = null;
   })
-
-  // setTimeout(function(){
-  //   openIDE({cwd: '/repos/bees', baseRef: 'head'}); // 12fb3cd
-  //   ide.webContents.toggleDevTools();
-  // },3000)
 }
 
-ipcMain.on("openSession", function(event, arg) {
-  openIDE(arg)
+
+ipcMain.on("client", function(event, arg) {
+  console.log("ipcmain app",arg);
+  return;
+  if(arg == 'ready'){
+    console.log("ipc ready");
+    if(splash && main){
+      main.setBounds(splash.getBounds());
+      splash.hide();
+      splash.destroy();
+      splash = null;
+      main.show();
+    }
+  }
+
+  if(arg == 'focus'){
+    app.focus();
+  }
 });
+
 
 ipcMain.on("state.get", function(event, arg) {
   console.log('state.get',arg);
@@ -344,6 +379,7 @@ app.on('activate', function () {
     // should not be possible(!)
     // createWindow()
   } else {
+    console.log("showing main window");
     main.show();
   } 
 })
