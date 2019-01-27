@@ -432,3 +432,7 @@ export class GitRepo < Git
 			self
 		emit('fetched',@fetching = no)
 		return
+		
+	def dispose
+		clearInterval(@intervals:fetch)
+		self

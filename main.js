@@ -39,7 +39,6 @@ autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
 log.info('App starting...');
 
-
 autoUpdater.on('checking-for-update', () => {
   devToolsLog('Checking for update...');
 })
@@ -139,6 +138,10 @@ async function setupTunnel(){
 
   tunnel.stdout.on('data', (data) => { 
     devToolsLog(String(data));
+  });
+
+  tunnel.stderr.on('data', (data) => { 
+    devToolsLog(String("error from tunnel: " + String(data)));
   })
 }
 

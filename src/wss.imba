@@ -1,7 +1,5 @@
 var WebSocket = require 'ws'
 
-# let wss = WebSocket.Server.new({port: 48010})
-
 import {Terminal} from './terminal'
 import {FileSystem} from './fs'
 import {Git,GitRepo} from './git'
@@ -25,16 +23,18 @@ class SocketClient
 
 	def send msg
 		process.send(JSON.stringify("send message?")) 
-		@ws.send(JSON.stringify(msg))
+		@ws.send(JSON.stringify(msg)) do |err|
+			if err
+				log "error sending message",err
 		self
 		
 	def onmessage msg
-		# rpc
 		if widget and widget[msg[0]] isa Function
 			widget[msg[0]].apply(widget,msg[1])
 		self
 	
 	def dispose
+		log "disposing wss client"
 		widget?.dispose
 
 class TerminalClient < SocketClient
@@ -62,18 +62,37 @@ export class SocketServer
 	
 	def initialize
 		@port = process:env.TUNNEL_PORT
+		@pinger = do this:isAlive = true
+		@noop = do yes
 		self
 
 	def log *params
 		process:stdout.write(JSON.stringify(params))
 		# process.send(JSON.stringify(params))
 		self
+		
+	def ping
+		self:isAlive = true
 
 	def start
 		log "starting socket server on {@port}"
 		@wss = WebSocket.Server.new(port: @port)
+		
+		@checker = setInterval(&,10000) do
+			log "checking ws connections"
+			@wss:clients.forEach do |ws|
+				if ws:isAlive === false
+					log "close ws connection"
+					return ws.terminate
+				ws:isAlive = false
+				ws.ping(@noop)
+
 		@wss.on 'connection' do |ws,req|
 			try
+				
+				ws:isAlive = true
+				ws.on('pong', @pinger)
+  
 				var opts = {}
 				var url = URL.new('http://127.0.0.1' + req:url)
 				let type = opts:type = url:searchParams.get('type')
@@ -96,6 +115,9 @@ export class SocketServer
 					RepoClient.new(ws,opts)
 			catch e
 				log "error",e:message
+		
+		@wss.on 'error' do |e|
+			log "error from wss",e && e:message
 		return
 
 export var wss = SocketServer.new.start
