@@ -9,7 +9,6 @@ const fixPath = require('fix-path');
 const log = require('electron-log');
 const { autoUpdater } = require("electron-updater");
 fixPath();
-const notifier = require('node-notifier');
 
 
 const {fstat} = require('./lib/fs');
