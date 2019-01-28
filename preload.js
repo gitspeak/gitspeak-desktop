@@ -2,7 +2,7 @@
 // Preload script
 // ==============
 const {remote,ipcRenderer,shell} = require('electron');
-	
+
 const machine = remote.require('./machine')
 
 window.interop = {
@@ -64,17 +64,20 @@ window.interop = {
       return remote.app.setBadgeCount(count);
     },
 
-    getGitBlob(localDirectory, sha) {
-      return machine.getGitBlob(localDirectory, sha)
+    getGitBlob(localDirectory, sha, refToFetch) {
+      return machine.getGitBlob(localDirectory, sha, refToFetch)
     },
   
-    getGitTree(localDirectory, sha) {
-      console.log('YES ABOUT TO CALL getGitTree!!!!!!!!!!')
-      return machine.getGitTree(localDirectory, sha)
+    getGitTree(localDirectory, sha, refToFetch) {
+      return machine.getGitTree(localDirectory, sha, refToFetch)
     },
 
     getGitDiff(localDirectory, base, head, includePatch) {
       return machine.getGitDiff(localDirectory, base, head, includePatch)
+    },
+
+    sendNotification(data){
+      new machine.Notification(data).show();
     },
   },
 

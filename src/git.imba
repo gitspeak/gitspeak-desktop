@@ -7,6 +7,7 @@ var gitRepoInfo = require 'git-repo-info'
 var cp = require 'child_process'
 var ibn = require 'isbinaryfile'
 
+var LINESEP = '\n'
 var FLAGS =
 	UNSAVED: 1
 	UNTRACKED: 2
@@ -29,6 +30,23 @@ var FLAGS =
 export def exec command, cwd
 	cp.execSync(command, cwd: cwd, env: process:env)
 
+export def shaExists cwd, treeish
+	try
+		exec("git cat-file -t {treeish}",cwd)
+		return yes
+	catch e
+		return no
+
+export def fetchSha cwd, sha, ref
+	return yes if shaExists(cwd,sha)
+	let cmd = ref ? "git fetch origin {ref}" : "git fetch"
+	let res = exec(cmd,cwd)
+
+	return yes
+
+export def isValidTreeish value
+	return value.match(/^[\:\/\-\.\w]+$/)
+
 ###
 --raw --numstat
 :100644 100644 06f59bf... 98ad458... M  README.md
@@ -43,6 +61,7 @@ export def exec command, cwd
 1       0       www/playground.js
 ###
 export def getGitDiff cwd, base, head, includePatch = no
+
 	let result = {
 		head: head
 		base: base
@@ -82,38 +101,36 @@ export def getGitDiff cwd, base, head, includePatch = no
 	return result
 
 
-def valid str
-	return str.match(/^[a-z0-9]+$/)
+export def getGitBlob cwd, sha, refToFetch
+	console.log "getGitBlob",cwd,sha,refToFetch
+	unless isValidTreeish(sha)
+		console.log "blob did not exist??",cwd,sha
+		return null 
+	# make sure we've fetched latest from remote
+	fetchSha(cwd,sha,refToFetch)
 
-def tryFetch cwd, sha, type
-	cp.execSync('git fetch', cwd: cwd, env: process:env)
-	if type == 'tree'
-		return getGitTree cwd, sha, yes
-	elif type == 'blob'
-		return getGitBlob cwd, sha, yes
-
-export def getGitBlob cwd, sha, returnAnyway = no
-	unless valid sha
-		return null
 	try
 		let buffer = cp.execSync('git cat-file -p ' + sha, cwd: cwd, env: process:env)
+		# not certain that we have the oid?
 		let obj = {
 			oid: sha
 			body: null
 			size: buffer:length
+			type: 'blob'
 		}
 		if !ibn.sync(buffer,obj:size) and obj:size < 200000 
 			obj:body = buffer.toString
 		return obj
 	catch error
-		if returnAnyway
-			return null
-		else
-			return tryFetch cwd, sha, 'blob'
-
-export def getGitTree cwd, sha, returnAnyway = no
-	unless valid sha
+		console.log "error from getGitBlob"
 		return null
+
+export def getGitTree cwd, sha, refToFetch
+	console.log "getGitTree",cwd,sha,refToFetch
+	return null unless isValidTreeish(sha)
+
+	fetchSha(cwd,sha,refToFetch)
+
 	try
 		let buffer = cp.execSync('git ls-tree -z -l ' + sha, cwd: cwd, env: process:env)
 		let tree = []
@@ -122,13 +139,13 @@ export def getGitTree cwd, sha, returnAnyway = no
 			let name = line.substr(line.indexOf('\t') + 1)
 			continue unless name
 			tree.push({sha: sha,size: osize, mode: mode, path: name, type: type})
-		return {data: {nodes: tree}}
+		return {
+			oid: sha
+			type: 'tree'
+			data: { nodes: tree }
+		}
 	catch error
-		if returnAnyway
-			return null
-		else
-			tryFetch cwd, sha, 'tree'
-	
+		return null
 
 export def getGitInfo cwd
 	var data = {}
@@ -355,4 +372,67 @@ export class Git < Component
 			# make sure we are in the right directory
 			term.write("cd {cwd}\n")
 			term.write(cmd + '\n')
+		self
+
+export class GitRepo < Git
+
+	def initialize owner, root, options = {}
+		@owner = owner
+		@root = root
+		@summary = {}
+		@intervals = {}
+		@refs = {}
+		if var repo = gitRepoInfo._findRepo(cwd)
+			var info = gitRepoInfo(cwd)
+			@summary:branch = info:branch
+			@summary:sha = info:sha
+			@summary:tag = info:tag
+			@summary:commit = info:commitMessage
+			@summary:root = info:root
+			log "GIT",info
+
+		
+		if var conf = parseGitConfig.sync(cwd: cwd, path: cwd + '/.git/config')
+			log "GITCONF",cwd,conf
+			let branchInfo = exec("branch -vv --no-abbrev --no-color").toString
+			let [m,name,head,remote] = branchInfo.match(/\* (\w+)\s+([a-f\d]+)\s(?:\[([^\]]+)\])?/)
+			@summary:remote = remote
+
+			if let origin = conf['remote "origin"']
+				self.origin = @summary:origin = origin:url
+		self
+
+	def start
+		emit('start',@summary)
+		# need to get noticed when tunnel is stopped
+		@intervals:fetch = setInterval(self:fetch.bind(self),10000)
+		sendRefs
+		self
+
+	def sendRefs
+		# only send changed refs
+		let refs = {}
+		let rawRefs = exec('show-ref').toString
+		for line in rawRefs.split(LINESEP)
+			var [sha,ref] = line.split(" ")
+			refs[ref] = sha
+		emit('refs',refs)
+		self
+
+	def fetch
+		return if @fetching
+		emit('fetching',@fetching = yes)
+		try
+			var res = exec('fetch -a origin "refs/pull/*:refs/pull/*"').toString
+			console.log "result is",res
+			# if there is a result - some branches may have updated -- send new refs
+			sendRefs if res and String(res):length > 2
+
+		catch e
+			self
+		emit('fetched',@fetching = no)
+		return
+		
+	def dispose
+		clearInterval(@intervals:fetch)
 		self

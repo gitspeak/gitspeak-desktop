@@ -3,7 +3,6 @@ try
 	var pty = require 'node-pty'
 catch e
 	console.log "could not load pty",e
-	yes
 
 var path = require "path"
 var fs = require "fs"

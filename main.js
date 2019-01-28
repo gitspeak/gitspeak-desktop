@@ -1,20 +1,22 @@
 // Modules to control application life and create native browser window
 const path = require('path')
 var fp = require("find-free-port")
-const {app, BrowserWindow,Tray,Menu,session, protocol,ipcMain, clipboard, shell} = require('electron')
+const {app, BrowserWindow,Tray,Menu,session, protocol,ipcMain, clipboard, shell, Notification} = require('electron')
 const fs = require('fs');
 const cp = require('child_process');
 const origFs = require('original-fs');
 const fixPath = require('fix-path');
 const log = require('electron-log');
 const { autoUpdater } = require("electron-updater");
-fixPath(); 
+fixPath();
+
 
 const {fstat} = require('./lib/fs');
 console.log('process.env.GSHOST:', process.env.GSHOST)
 console.log('process.env.GH_TOKEN:', process.env.GH_TOKEN)
 
 const HOST = process.env.GSHOST || 'gitspeak.com';
+const DEBUG = process.env.DEBUG;
 // process.noAsar = true;
 
 const gotTheLock = app.requestSingleInstanceLock();
@@ -22,6 +24,7 @@ const gotTheLock = app.requestSingleInstanceLock();
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let main
+let splash
 let tunnel
 let initialUrl = '/';
 let state = {
@@ -36,7 +39,6 @@ var logQueue = [];
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
 log.info('App starting...');
-
 
 autoUpdater.on('checking-for-update', () => {
   devToolsLog('Checking for update...');
@@ -56,14 +58,10 @@ autoUpdater.on('download-progress', (progressObj) => {
   log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
   devToolsLog(log_message);
 })
+
 autoUpdater.on('update-downloaded', (info) => {
   devToolsLog('Update downloaded');
 });
-
-function devToolsLog(text) {
-  log.info(text);
-  main.webContents.send('message', text);
-}
 
 const editMenu = {
     label: "Edit",
@@ -121,9 +119,8 @@ async function setupTunnel(){
   state.ports = await fp(48000, 49000, '127.0.0.1', 1);
   state.tunnelPort = state.ports[0];
 
-  console.log("tunnel port",state.tunnelPort);
-
   process.env.TUNNEL_PORT = state.tunnelPort;
+
   let env = {
     PATH: process.env.PATH, 
     TUNNEL_PORT: state.tunnelPort
@@ -137,6 +134,10 @@ async function setupTunnel(){
 
   tunnel.stdout.on('data', (data) => { 
     devToolsLog(String(data));
+  });
+
+  tunnel.stderr.on('data', (data) => { 
+    devToolsLog(String("error from tunnel: " + String(data)));
   })
 }
 
@@ -149,7 +150,9 @@ function openIDE(params){
 
 function devToolsLog(s) {
   console.log(s)
-  if (main && main.webContents) {
+  log.info(s);
+
+  if (main && main.webContents && DEBUG) {
     main.webContents.send('message',{type: 'log', data: s});
   } else {
     logQueue.push(s);
@@ -157,6 +160,35 @@ function devToolsLog(s) {
 }
 
 async function setupApplication () {
+  let opts = {
+    width: 420,
+    height: 280,
+    title: "GitSpeak",
+    titleBarStyle: 'hidden',
+    hasShadow: false,
+    vibrancy: null,
+    center: true,
+    movable: false,
+    resizable: false,
+    minimizable: false,
+    maximizable: false,
+    closable: false,
+    alwaysOnTop: true,
+    show: false
+  }
+
+  // Create loading-screen that will show until we have loaded GitSpeak
+  splash = new BrowserWindow(Object.assign({
+
+  },opts));
+
+  splash.once('ready-to-show', function(event, url) {
+    splash.show();
+    return this;
+  });
+
+  splash.loadURL(`file://${__dirname}/splash.html`);
+
   await setupTunnel();
 
   // Create the browser window.
@@ -166,25 +198,32 @@ async function setupApplication () {
     title: "GitSpeak",
     titleBarStyle: 'hiddenInset',
     vibrancy: null,
-    // icon: path.join(__dirname,'build','icon.png'),
+    show: false,
     webPreferences: {
       partition: 'persist:main',
       // webSecurity: false,
       preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: true,
+      nodeIntegration: true, // should be disabled?
       contextIsolation: false,
       nativeWindowOpen: true,
+      backgroundThrottling: false,
       affinity: 'myAffinity'
     }
-  }) 
- 
-
+  })
 
   main.setMenu(null);
   state.currentWindow = main;
   main.loadURL("https://" + HOST + initialUrl);
   devToolsLog(logQueue);
-  console.log("logging!!!",logQueue);
+
+  main.on('show',function(event){
+    if(splash){
+      splash.hide();
+      splash.destroy();
+      splash = null;
+    }
+  });
+
   var doc = main.webContents;
 
   doc.on('will-navigate', function(event, url) {
@@ -197,18 +236,7 @@ async function setupApplication () {
     var outerPos = main.getPosition();
     var outerSize = main.getSize();
 
-    var defaults = {
-      ghlogin: {
-        width: 400,
-        height: 540,
-        resizable: false
-      },
-      ghapp: {
-        width: 1020,
-        height: 790,
-        resizable: false
-      }
-    }
+    var defaults = {}
 
     if(frameName == 'ghlogin'){
       shell.openExternal(url);
@@ -245,10 +273,6 @@ async function setupApplication () {
     }
   })
 
-  // main.on('focus',() => {
-  //   state.currentWindow = main;
-  // })
-
   main.on('close', (e) => {
     if(main.forceClose) return;
     e.preventDefault();
@@ -259,16 +283,28 @@ async function setupApplication () {
   main.on('closed', function () {
     main = null;
   })
-
-  // setTimeout(function(){
-  //   openIDE({cwd: '/repos/bees', baseRef: 'head'}); // 12fb3cd
-  //   ide.webContents.toggleDevTools();
-  // },3000)
 }
 
-ipcMain.on("openSession", function(event, arg) {
-  openIDE(arg)
+
+ipcMain.on("client", function(event, arg) {
+  console.log("ipcmain app",arg);
+  return;
+  if(arg == 'ready'){
+    console.log("ipc ready");
+    if(splash && main){
+      main.setBounds(splash.getBounds());
+      splash.hide();
+      splash.destroy();
+      splash = null;
+      main.show();
+    }
+  }
+
+  if(arg == 'focus'){
+    app.focus();
+  }
 });
+
 
 ipcMain.on("state.get", function(event, arg) {
   console.log('state.get',arg);
@@ -343,6 +379,7 @@ app.on('activate', function () {
     // should not be possible(!)
     // createWindow()
   } else {
+    console.log("showing main window");
     main.show();
   } 
 })
