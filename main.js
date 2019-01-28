@@ -16,6 +16,7 @@ console.log('process.env.GSHOST:', process.env.GSHOST)
 console.log('process.env.GH_TOKEN:', process.env.GH_TOKEN)
 
 const HOST = process.env.GSHOST || 'gitspeak.com';
+const DEBUG = process.env.DEBUG;
 // process.noAsar = true;
 
 const gotTheLock = app.requestSingleInstanceLock();
@@ -57,14 +58,10 @@ autoUpdater.on('download-progress', (progressObj) => {
   log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
   devToolsLog(log_message);
 })
+
 autoUpdater.on('update-downloaded', (info) => {
   devToolsLog('Update downloaded');
 });
-
-function devToolsLog(text) {
-  log.info(text);
-  main.webContents.send('message', text);
-}
 
 const editMenu = {
     label: "Edit",
@@ -122,9 +119,8 @@ async function setupTunnel(){
   state.ports = await fp(48000, 49000, '127.0.0.1', 1);
   state.tunnelPort = state.ports[0];
 
-  console.log("tunnel port",state.tunnelPort);
-
   process.env.TUNNEL_PORT = state.tunnelPort;
+
   let env = {
     PATH: process.env.PATH, 
     TUNNEL_PORT: state.tunnelPort
@@ -154,7 +150,9 @@ function openIDE(params){
 
 function devToolsLog(s) {
   console.log(s)
-  if (main && main.webContents) {
+  log.info(s);
+
+  if (main && main.webContents && DEBUG) {
     main.webContents.send('message',{type: 'log', data: s});
   } else {
     logQueue.push(s);
