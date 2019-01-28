@@ -12,6 +12,7 @@ fixPath();
 
 
 const {fstat} = require('./lib/fs');
+const menuTemplate = require('./menu')
 console.log('process.env.GSHOST:', process.env.GSHOST)
 console.log('process.env.GH_TOKEN:', process.env.GH_TOKEN)
 
@@ -211,6 +212,8 @@ async function setupApplication () {
     }
   })
 
+  var menu = Menu.buildFromTemplate(menuTemplate.template);
+  Menu.setApplicationMenu(menu);
   main.setMenu(null);
   state.currentWindow = main;
   main.loadURL("https://" + HOST + initialUrl);
