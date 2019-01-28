@@ -1,6 +1,6 @@
 {
   "name": "gitspeak",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "productName": "GitSpeak",
   "description": "Desktop client for GitSpeak",
   "main": "main.js",
@@ -15,6 +15,7 @@
     "build": "electron-builder",
     "watch": "imbac -w -o lib src",
     "release": "electron-builder",
+    "deploy": "imba deploy.imba",
     "postinstall": "electron-builder install-app-deps"
   },
   "repository": {

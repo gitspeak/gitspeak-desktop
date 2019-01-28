@@ -166,7 +166,7 @@ async function setupApplication () {
     height: 280,
     title: "GitSpeak",
     titleBarStyle: 'hidden',
-    hasShadow: false,
+    hasShadow: true,
     vibrancy: null,
     center: true,
     movable: false,
