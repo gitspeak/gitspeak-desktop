@@ -12,13 +12,10 @@
     "start-dev": "open node_modules/electron/dist/Electron.app --args $PWD",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
+    "build": "electron-builder",
     "watch": "imbac -w -o lib src",
     "release": "electron-builder",
-    "postinstall": "electron-builder install-app-deps",
-    "gh-publish": "electron-builder --publish --mlw always",
-    "gh-publish:mac": "electron-builder --mac --publish always",
-    "gh-publish:win": "electron-builder --win --publish always",
-    "gh-publish:linux": "electron-builder --linux --publish always"
+    "postinstall": "electron-builder install-app-deps"
   },
   "repository": {
     "type": "git",
@@ -41,11 +38,6 @@
   "build": {
     "appId": "com.gitspeak.app",
     "asar": false,
-    "publish": {
-      "provider": "github",
-      "repo": "gitspeak-desktop",
-      "owner": "scrimba"
-    },
     "mac": {
       "target": [
         "dmg",
