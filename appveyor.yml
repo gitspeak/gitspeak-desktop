@@ -31,7 +31,7 @@ build_script:
 
 branches:
   only:
-    - release
+    - appveyor
 
 deploy:
   provider: GitHub
