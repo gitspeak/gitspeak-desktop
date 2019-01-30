@@ -41,4 +41,8 @@ deploy:
   on:
     branch: appveyor
 
+artifacts:
+  - path: bin
+    name: gitspeak-desktop
+
 test: off
