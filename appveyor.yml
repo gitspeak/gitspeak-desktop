@@ -36,7 +36,8 @@ branches:
 deploy:
   provider: GitHub
   auth_token:
-    secure: "$GH_TOKEN"
+    secure: 0EFPhJviDyp/yQqq+6te+ph61+3vCnmAcK7LUrHHY9a7ECXDTZqKIqDgszMkyo4B
+
   on:
     branch: appveyor
 
