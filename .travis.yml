@@ -1,108 +1,3 @@
-# osx_image: xcode10.1 # define OS X image which will be mounted
-
-# dist: trusty # use Ubuntu Trusty for Linux operation system
-
-# Note: if you switch to sudo: false, you'll need to launch chrome with --no-sandbox.
-# See https://github.com/travis-ci/travis-ci/issues/8836
-# sudo: required
-
-# Define Node.js as the programming language as we have a web application
-#language: node_js
-#node_js: '10.14.0'
-
-
-# FROM DOCS - 
-
-# matrix:
-#   include:
-#     - os: osx
-#       osx_image: xcode9.4
-#       language: node_js
-#       node_js: "10"
-#       env:
-#         - ELECTRON_CACHE=$HOME/.cache/electron
-#         - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
-
-#     - os: linux
-#       services: docker
-#       language: generic
-
-# cache:
-#   directories:
-#     - node_modules
-#     - $HOME/.cache/electron
-#     - $HOME/.cache/electron-builder
-#     - $HOME/Library/Caches/Homebrew
-
-# script:
-#   - |
-#     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-#       docker run --rm \
-#         --env-file <(env | grep -iE 'DEBUG|NODE_|ELECTRON_|YARN_|NPM_|CI|CIRCLE|TRAVIS|APPVEYOR_|CSC_|_TOKEN|_KEY|AWS_|STRIP|BUILD_') \
-#         -v ${PWD}:/project \
-#         -v ~/.cache/electron:/root/.cache/electron \
-#         -v ~/.cache/electron-builder:/root/.cache/electron-builder \
-#         electronuserland/builder:wine \
-#         /bin/bash -c "yarn --link-duplicates --pure-lockfile && yarn release --linux --win"
-#     else
-#       yarn release
-#     fi
-# before_cache:
-#   - brew cleanup
-#   - rm -rf $HOME/.cache/electron-builder/wine
-
-# branches:
-#   except:
-#     - "/^v\\d+\\.\\d+\\.\\d+$/"
-
-# ...
-
-
-
-# addons:
-#  chrome: stable # Install chrome stable on operating systems
-
-# A list of operating systems which are used for tests
-# os:
-#   - linux
-#   - osx
-
-# env:
-#   global:
-#     - ELECTRON_CACHE=$HOME/.cache/electron
-#     - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
-
-#cache:
-#  yarn: true
-  # directories:
-  #   - $HOME/.cache/electron
-  #   - $HOME/.cache/electron-builder
-  #   - $HOME/.npm/_prebuilds
-
-#before_cache:
-#  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then rm -rf $HOME/.cache/electron-builder/wine; fi
-
-  # These commands are executed before the scripts are executed
-#install:
-  # On OS X we first need to install Yarn via Homebrew
-  # - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install yarn; fi
-  # Install all dependencies listed in your package.json file
-  # - yarn
-
-# script:
-#  - echo "Deploy linux version to GitHub"
-#  - if [[ "$TRAVIS_BRANCH" == "master" ]] && [[ "$TRAVIS_OS_NAME" == "linux" ]]; then yarn gh-release:linux; fi
-
-#  - echo "Deploy windows version to GitHub"
-#  - if [[ "$TRAVIS_BRANCH" == "master" ]] && [[ "$TRAVIS_OS_NAME" == "win" ]]; then yarn gh-release:win; fi
-
-#  - echo "Deploy mac version to GitHub"
-#  - if [[ "$TRAVIS_BRANCH" == "travis-config" ]] && [[ "$TRAVIS_OS_NAME" == "osx" ]]; then yarn gh-publish:mac; fi
-
-
-
-## FROM ISSUE: https://github.com/electron-userland/electron-builder/issues/1751
-
 osx_image: xcode10.1
 
 dist: trusty
@@ -143,8 +38,8 @@ before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
 
 branches:
-  except:
-    - "/^v\\d+\\.\\d+\\.\\d+$/"
+  only:
+    - release
 
 deploy:
   provider: releases
