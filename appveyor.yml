@@ -38,6 +38,6 @@ deploy:
   auth_token:
     secure: "$GH_TOKEN"
   on:
-    branch: release
+    branch: appveyor
 
 test: off
