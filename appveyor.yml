@@ -27,10 +27,10 @@ install:
   - ps: $env:package_version = (Get-Content -Raw -Path package.json | ConvertFrom-JSON).version 
   - ps: echo $env:package_version
   - ps: Update-AppveyorBuild -Version "$env:package_version-$env:APPVEYOR_BUILD_NUMBER"
-  - yarn
+  - npm install
 
 build_script:
-  - yarn release -- --win
+  - npm run dist --win
 
 branches:
   only:
