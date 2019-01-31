@@ -24,6 +24,9 @@ init:
 
 install:
   - ps: Install-Product node 10 x64
+  - ps: $env:package_version = (Get-Content -Raw -Path package.json | ConvertFrom-JSON).version 
+  - ps: echo $env:package_version
+  - ps: Update-AppveyorBuild -Version "$env:package_version-$env:APPVEYOR_BUILD_NUMBER"
   - yarn
 
 build_script:
@@ -33,17 +36,17 @@ branches:
   only:
     - appveyor
 
-artifacts:
-  - path: dist
-    name: gitspeak-desktop
+# artifacts:
+#   - path: dist
+#     name: gitspeak-desktop
 
-deploy:
-  provider: GitHub
-  artifact: gitspeak-desktop
-  auth_token:
-    secure: 0EFPhJviDyp/yQqq+6te+ph61+3vCnmAcK7LUrHHY9a7ECXDTZqKIqDgszMkyo4B
-  on:
-    branch: appveyor
+# deploy:
+#   provider: GitHub
+#   artifact: gitspeak-desktop
+#   auth_token:
+#     secure: 0EFPhJviDyp/yQqq+6te+ph61+3vCnmAcK7LUrHHY9a7ECXDTZqKIqDgszMkyo4B
+#   on:
+#     branch: appveyor
 
 
 test: off
