@@ -36,6 +36,7 @@ branches:
   only:
     - appveyor
 
+# If we want AppVeyor to handle deployment instead of electron-builder
 # artifacts:
 #   - path: dist
 #     name: gitspeak-desktop
