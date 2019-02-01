@@ -28,7 +28,7 @@ install:
   - ps: echo $env:package_version
   - ps: Update-AppveyorBuild -Version "$env:package_version:APPVEYOR_BUILD_NUMBER"
   - ps: npm -v
-  - ps: npm -v
+  - ps: node -v
   - npm install
 
 build_script:
