@@ -34,7 +34,7 @@ build_script:
 
 branches:
   only:
-    - appveyor
+    - release
 
 # If we want AppVeyor to handle deployment instead of electron-builder
 # artifacts:
@@ -47,7 +47,7 @@ branches:
 #   auth_token:
 #     secure: 0EFPhJviDyp/yQqq+6te+ph61+3vCnmAcK7LUrHHY9a7ECXDTZqKIqDgszMkyo4B
 #   on:
-#     branch: appveyor
+#     branch: release
 
 
 test: off
