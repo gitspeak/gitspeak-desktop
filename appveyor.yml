@@ -34,7 +34,7 @@ build_script:
 
 branches:
   only:
-    - release
+    - appveyor
 
 # If we want AppVeyor to handle deployment instead of electron-builder
 # artifacts:
