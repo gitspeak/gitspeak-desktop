@@ -2,7 +2,7 @@
 image: Visual Studio 2017
 
 environment:
-  nodejs_version: 10
+  nodejs_version: 10.14.2
 
 # Post-install test scripts!
 test_script:
@@ -23,12 +23,13 @@ init:
   - git config --global core.autocrlf input
 
 install:
-  - ps: Install-Product node 10 x64
+  - ps: Install-Product node 10.14.2 x64
   - ps: $env:package_version = "v" + (Get-Content -Raw -Path package.json | ConvertFrom-JSON).version 
   - ps: echo $env:package_version
   - ps: Update-AppveyorBuild -Version "$env:package_version:APPVEYOR_BUILD_NUMBER"
   - ps: npm -v
   - ps: node -v
+  - ps: npm install --global --production windows-build-tools
   - npm install
 
 build_script:
