@@ -1,6 +1,6 @@
 
 try
-	var pty = require 'node-pty'
+	var pty = require 'node-pty-prebuilt'
 catch e
 	console.log "could not load pty",e
 
