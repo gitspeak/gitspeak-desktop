@@ -29,7 +29,6 @@ install:
   - ps: Update-AppveyorBuild -Version "$env:package_version:APPVEYOR_BUILD_NUMBER"
   - ps: npm -v
   - ps: node -v
-  - ps: npm install --global --production windows-build-tools
   - npm install
 
 build_script:
