@@ -31,7 +31,7 @@ install:
   - yarn
 
 script:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then yarn build; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then yarn build --linux; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then yarn build --mac; fi
 
 before_cache:
