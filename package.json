@@ -1,6 +1,6 @@
 {
   "name": "gitspeak",
-  "version": "0.1.43",
+  "version": "0.1.44",
   "productName": "GitSpeak",
   "description": "Desktop client for GitSpeak",
   "main": "main.js",
