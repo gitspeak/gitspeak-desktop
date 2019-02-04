@@ -117,10 +117,13 @@ function devToolsLog(s) {
   }
 }
 
+var url_scheme = "gitspeak";
+protocol.registerSchemesAsPrivileged([
+  { scheme: url_scheme }
+])
+app.setAsDefaultProtocolClient(url_scheme);
+
 async function setupApplication () {
-  var url_scheme = "gitspeak";
-  protocol.registerStandardSchemes([url_scheme]);
-  app.setAsDefaultProtocolClient('gitspeak');
 
   let opts = {
     width: 420,
