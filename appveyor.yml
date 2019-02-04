@@ -27,14 +27,15 @@ install:
   - ps: $env:package_version = "v" + (Get-Content -Raw -Path package.json | ConvertFrom-JSON).version 
   - ps: echo $env:package_version
   - ps: Update-AppveyorBuild -Version "$env:package_version:APPVEYOR_BUILD_NUMBER"
+  - npm uninstall node-pty --save
   - npm install
 
 build_script:
-  - npm run build --win
+  - npm run dist --win
 
 branches:
   only:
-    - release
+    - win
 
 # If we want AppVeyor to handle deployment instead of electron-builder
 # artifacts:
