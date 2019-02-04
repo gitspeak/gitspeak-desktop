@@ -64,44 +64,6 @@ autoUpdater.on('update-downloaded', (info) => {
   devToolsLog('Update downloaded');
 });
 
-const editMenu = {
-    label: "Edit",
-    submenu: [
-      {
-        label: "Undo",
-        accelerator: "CmdOrCtrl+Z",
-        selector: "undo:"
-      },
-      {
-        label: "Redo",
-        accelerator: "Shift+CmdOrCtrl+Z",
-        selector: "redo:"
-      },
-      {
-        type: "separator"
-      },
-      {
-        label: "Cut",
-        accelerator: "CmdOrCtrl+X",
-        selector: "cut:"
-      },
-      {
-        label: "Copy",
-        accelerator: "CmdOrCtrl+C",
-        selector: "copy:"
-      },
-      {
-        label: "Paste",
-        accelerator: "CmdOrCtrl+V",
-        selector: "paste:"
-      },
-      {
-        label: "Select All",
-        accelerator: "CmdOrCtrl+A",
-        selector: "selectAll:"
-      }
-    ]
-  }
 
 var url_scheme = "gitspeak";
 protocol.registerStandardSchemes([url_scheme]);
@@ -180,7 +142,7 @@ async function setupApplication () {
 
   // Create loading-screen that will show until we have loaded GitSpeak
   splash = new BrowserWindow(Object.assign({
-
+    autoHideMenuBar: true 
   },opts));
 
   splash.once('ready-to-show', function(event, url) {
@@ -189,7 +151,6 @@ async function setupApplication () {
   });
 
   splash.loadURL(`file://${__dirname}/splash.html`);
-
   await setupTunnel();
 
   // Create the browser window.
@@ -214,7 +175,6 @@ async function setupApplication () {
 
   var menu = Menu.buildFromTemplate(menuTemplate.template);
   Menu.setApplicationMenu(menu);
-  main.setMenu(null);
   state.currentWindow = main;
   main.loadURL("https://" + HOST + initialUrl);
   devToolsLog(logQueue);
@@ -228,7 +188,6 @@ async function setupApplication () {
   });
 
   var doc = main.webContents;
-
   doc.on('will-navigate', function(event, url) {
     return this;
   });
