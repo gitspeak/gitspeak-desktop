@@ -64,11 +64,6 @@ autoUpdater.on('update-downloaded', (info) => {
   devToolsLog('Update downloaded');
 });
 
-
-var url_scheme = "gitspeak";
-protocol.registerStandardSchemes([url_scheme]);
-app.setAsDefaultProtocolClient('gitspeak');
-
 function rpc(name,...args){
   var doc = main.webContents;
   var res = doc.send('message',{type: 'rpc', data: [name,args]});
@@ -123,6 +118,10 @@ function devToolsLog(s) {
 }
 
 async function setupApplication () {
+  var url_scheme = "gitspeak";
+  protocol.registerStandardSchemes([url_scheme]);
+  app.setAsDefaultProtocolClient('gitspeak');
+
   let opts = {
     width: 420,
     height: 280,
