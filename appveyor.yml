@@ -31,11 +31,11 @@ install:
   - npm install
 
 build_script:
-  - npm run dist --win
+  - npm run build --win
 
 branches:
   only:
-    - win
+    - release
 
 # If we want AppVeyor to handle deployment instead of electron-builder
 # artifacts:
