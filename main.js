@@ -66,7 +66,7 @@ autoUpdater.on('update-downloaded', (info) => {
 
 
 var url_scheme = "gitspeak";
-// protocol.registerStandardSchemes([url_scheme]);
+protocol.registerStandardSchemes([url_scheme]);
 app.setAsDefaultProtocolClient('gitspeak');
 
 function rpc(name,...args){
@@ -188,7 +188,6 @@ async function setupApplication () {
   });
 
   var doc = main.webContents;
-  doc.openDevTools()
   doc.on('will-navigate', function(event, url) {
     return this;
   });
