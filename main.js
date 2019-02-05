@@ -10,11 +10,6 @@ const log = require('electron-log');
 const { autoUpdater } = require("electron-updater");
 fixPath();
 
-console.log('process.env.APPIMAGE: ', process.env.APPIMAGE)
-process.env.APPIMAGE = app.getAppPath()
-console.log('app.getAppPath(): ', app.getAppPath());
-console.log('process.env.APPIMAGE: ', process.env.APPIMAGE)
-
 const {fstat} = require('./lib/fs');
 const menuTemplate = require('./menu')
 console.log('process.env.GSHOST:', process.env.GSHOST)
@@ -121,11 +116,11 @@ function devToolsLog(s) {
   }
 }
 
-// var url_scheme = "gitspeak";
-// protocol.registerSchemesAsPrivileged([
-//   { scheme: url_scheme }
-// ])
-// app.setAsDefaultProtocolClient(url_scheme);
+var url_scheme = "gitspeak";
+protocol.registerSchemesAsPrivileged([
+  { scheme: url_scheme }
+])
+app.setAsDefaultProtocolClient(url_scheme);
 
 async function setupApplication () {
 
@@ -188,7 +183,6 @@ async function setupApplication () {
   main.on('show',function(event){
     if(splash){
       splash.hide();
-      splash.close();
       splash.destroy();
       splash = null;
     }
