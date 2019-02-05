@@ -54,7 +54,7 @@
       "icon": "./build/icon.icns"
     },
     "linux": {
-      "target": "deb",
+      "target": "AppImage",
       "category": "Development"
     },
     "protocols": [
