@@ -1,6 +1,6 @@
 {
   "name": "gitspeak",
-  "version": "0.1.50",
+  "version": "0.1.51",
   "productName": "GitSpeak",
   "description": "Desktop client for GitSpeak",
   "main": "main.js",
@@ -81,7 +81,6 @@
     "install": "^0.12.2",
     "isbinaryfile": "^3.0.3",
     "msgpack-lite": "^0.1.26",
-    "node-pty": "^0.8.1",
     "node-watch": "^0.5.8",
     "parse-git-config": "^2.0.3",
     "simple-git": "^1.106.0",

@@ -121,11 +121,11 @@ function devToolsLog(s) {
   }
 }
 
-var url_scheme = "gitspeak";
-protocol.registerSchemesAsPrivileged([
-  { scheme: url_scheme }
-])
-app.setAsDefaultProtocolClient(url_scheme);
+// var url_scheme = "gitspeak";
+// protocol.registerSchemesAsPrivileged([
+//   { scheme: url_scheme }
+// ])
+// app.setAsDefaultProtocolClient(url_scheme);
 
 async function setupApplication () {
 
@@ -188,6 +188,7 @@ async function setupApplication () {
   main.on('show',function(event){
     if(splash){
       splash.hide();
+      splash.close();
       splash.destroy();
       splash = null;
     }
@@ -243,7 +244,6 @@ async function setupApplication () {
 
   main.on('close', (e) => {
     if(main.forceClose) return;
-    e.preventDefault();
     main.hide();
   })
 
@@ -331,7 +331,7 @@ app.on('quit', () => {
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
-  console.log('window-all-closed')
+  console.log('window-all-closed triggered')
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
