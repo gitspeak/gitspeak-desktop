@@ -7,7 +7,7 @@ const cp = require('child_process');
 const origFs = require('original-fs');
 const fixPath = require('fix-path');
 const log = require('electron-log');
-const { autoUpdater } = require("electron-updater");
+const { autoUpdater quitAndInstall} = require("electron-updater");
 fixPath();
 
 console.log('process.env.APPIMAGE: ', process.env.APPIMAGE)
@@ -334,6 +334,7 @@ app.on('window-all-closed', function () {
   console.log('window-all-closed')
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
+  console.log('window-all-closed, process.platform ', process.platform)
   if (process.platform !== 'darwin') {
     app.quit()
   }
