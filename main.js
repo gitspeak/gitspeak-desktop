@@ -10,6 +10,10 @@ const log = require('electron-log');
 const { autoUpdater } = require("electron-updater");
 fixPath();
 
+console.log('process.env.APPIMAGE: ', process.env.APPIMAGE)
+process.env.APPIMAGE = app.getAppPath()
+console.log('app.getAppPath(): ', app.getAppPath());
+console.log('process.env.APPIMAGE: ', process.env.APPIMAGE)
 
 const {fstat} = require('./lib/fs');
 const menuTemplate = require('./menu')
