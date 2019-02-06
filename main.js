@@ -236,10 +236,13 @@ async function setupApplication () {
     }
   })
 
-  main.on('close', (e) => {
-    if(main.forceClose) return;
-    main.hide();
-  })
+  if (process.platform === 'darwin') {
+    main.on('close', (e) => {
+      if(main.forceClose) return;
+      e.preventDefault();
+      main.hide();
+    })
+  }
 
   // Emitted when the window is closed.
   main.on('closed', function () {
@@ -310,7 +313,6 @@ app.on('open-url', (event,url) => {
 })
 
 app.on('before-quit', () => {
-  console.log('before-quit')
   if(main) main.forceClose = true;
   tunnel.send({type: 'kill'});
   tunnel.kill('SIGINT')
