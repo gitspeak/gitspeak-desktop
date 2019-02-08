@@ -1,6 +1,6 @@
 {
   "name": "gitspeak",
-  "version": "0.1.56",
+  "version": "0.1.57",
   "productName": "GitSpeak",
   "description": "Desktop client for GitSpeak",
   "main": "main.js",
@@ -12,6 +12,7 @@
     "start-dev": "open node_modules/electron/dist/Electron.app --args $PWD",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
+    "prepare-win": "npm uninstall node-pty --save", 
     "build": "electron-builder --publish always",
     "rebuild": "electron-rebuild -f -w node-pty",
     "watch": "imbac -w -o lib src",
