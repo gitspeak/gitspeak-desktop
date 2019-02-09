@@ -1,6 +1,6 @@
 {
   "name": "gitspeak",
-  "version": "0.1.62",
+  "version": "0.1.64",
   "productName": "GitSpeak",
   "description": "Desktop client for GitSpeak",
   "main": "main.js",
@@ -40,7 +40,7 @@
   },
   "build": {
     "appId": "com.gitspeak.app",
-    "asar": false,
+    "asar": true,
     "publish": {
       "provider": "github",
       "owner": "scrimba"
