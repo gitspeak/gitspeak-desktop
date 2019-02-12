@@ -67,7 +67,6 @@ export def getGitDiff cwd, base, head, includePatch = no
 		base: base
 		diff: []
 	}
-
 	let raw = exec("git diff --raw --numstat {base}..{head}",cwd).toString
 	let lines = raw.split('\n')
 	let len = Math.floor(lines:length * 0.5)
@@ -97,7 +96,6 @@ export def getGitDiff cwd, base, head, includePatch = no
 				node:patch = patch
 
 		result:diff.push node
-
 	return result
 
 
@@ -423,7 +421,7 @@ export class GitRepo < Git
 		return if @fetching
 		emit('fetching',@fetching = yes)
 		try
-			var res = exec('fetch -a origin "refs/pull/*:refs/pull/*"').toString
+			var res = exec('fetch -a -f origin "refs/pull/*:refs/pull/*"').toString
 			console.log "result is",res
 			# if there is a result - some branches may have updated -- send new refs
 			sendRefs if res and String(res):length > 2
