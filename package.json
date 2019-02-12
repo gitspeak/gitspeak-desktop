@@ -1,6 +1,6 @@
 {
   "name": "gitspeak",
-  "version": "0.1.66",
+  "version": "0.1.67",
   "productName": "GitSpeak",
   "description": "Desktop client for GitSpeak",
   "main": "main.js",
@@ -57,6 +57,11 @@
       "target": "NSIS",
       "icon": "./build/icon.icns",
       "publisherName": "Scrimba AS"
+    },
+    "nsis": {
+      "createDesktopShortcut": true,
+      "runAfterFinish": true,
+      "installerIcon": "./build/icon.icns"
     },
     "linux": {
       "target": [
