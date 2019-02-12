@@ -110,7 +110,6 @@ function openIDE(params){
 
 
 function devToolsLog(s) {
-  console.log(s)
   log.info(s);
 
   if (main && main.webContents && DEBUG) {

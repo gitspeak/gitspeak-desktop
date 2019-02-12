@@ -29,6 +29,7 @@ class SocketClient
 		self
 		
 	def onmessage msg
+		log "wss.onmessage",msg[0],msg[1]
 		if widget and widget[msg[0]] isa Function
 			widget[msg[0]].apply(widget,msg[1])
 		self

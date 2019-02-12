@@ -213,7 +213,8 @@ export class FileSystem < Component
 		if stat.isFile
 			node:size = stat:size
 			# include body immediately if changed file
-			loadNodeBody(node) if node:status
+			if node:status # why fetch this instantly?
+				await loadNodeBody(node)
 
 		if stat.isSymbolicLink
 			node:symlink = yes
@@ -230,13 +231,25 @@ export class FileSystem < Component
 		if node:type == 'file'
 			let prev = node:body
 			if !isBinary(node:path) and node:size < 200000
-				node:body = @contents[path] = extfs.readFileSync(absPath(path),'utf-8') or ""
-				node:lazy = no
-				node:flags = node:flags & (~FLAGS.LAZY)
-				# if emitRead
-				# 	console.log "emit nodeBody",path,node:body
-				if node:body != prev and emitRead
-					emit('read',path,node:body)
+				return Promise.new do |resolve,reject|
+					extfs.readFile(absPath(path),'utf-8') do |err,data|
+						log "found file content",data,emitRead
+						let prev = node:body		
+						node:body = @contents[path] = data
+						node:lazy = no
+						node:flags = node:flags & (~FLAGS.LAZY)
+						if node:body != prev and emitRead
+							emit('read',path,node:body)
+						resolve(node)
+		return Promise.resolve(node)
+
+		# node:body = @contents[path] = extfs.readFileSync(absPath(path),'utf-8') or ""
+		# node:lazy = no
+		# node:flags = node:flags & (~FLAGS.LAZY)
+		# # if emitRead
+		# # 	console.log "emit nodeBody",path,node:body
+		# if node:body != prev and emitRead
+		# 	emit('read',path,node:body)
 		
 	def register path, node
 		@entries[path] = node
@@ -252,17 +265,13 @@ export class FileSystem < Component
 		path = relPath(path)
 		return if absPath(path) == cwd
 
-		let node = get(path, recursive: yes)
-
+		let node = await get(path, recursive: yes)
+		log "reading",node
 		if node:lazy
 			node:lazy = no
 		
 		if node:type == 'file'
-			loadNodeBody(node,yes)
-			# if body == undefined
-			# 	unless isBinary(path)
-			# 		body = @contents[path] = extfs.readFileSync(absPath(path),'utf-8') or ""
-			# 		emit('read',path,body)
+			await loadNodeBody(node,yes)
 
 		elif node:type == 'dir'
 			watchDir(node)
@@ -317,7 +326,8 @@ export class FileSystem < Component
 		
 		let abs = absPath(node:path)
 		for file in extfs.readdirSync(abs)
-			get(path.join(abs,file))
+			await get(path.join(abs,file))
+
 		self
 		
 	def refreshChanges
