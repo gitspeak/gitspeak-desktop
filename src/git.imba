@@ -6,6 +6,7 @@ var hostedGitInfo = require 'hosted-git-info'
 var gitRepoInfo = require 'git-repo-info'
 var cp = require 'child_process'
 var ibn = require 'isbinaryfile'
+var util = require './util'
 
 var LINESEP = '\n'
 var FLAGS =
@@ -227,7 +228,7 @@ export class Git < Component
 
 	def execAsync cmd
 		Promise.new do |resolve,reject|
-			cp.exec('git ' + cmd, cwd: cwd, env: process:env) do |err,stdout,stderr|
+			cp.exec('git ' + cmd, cwd: cwd, env: process:env,maxBuffer: 1024 * 500) do |err,stdout,stderr|
 				return reject(err) if err
 				resolve(stdout.toString)
 
@@ -426,6 +427,41 @@ export class GitRepo < Git
 			refs[ref] = sha
 		emit('refs',refs)
 		self
+
+	def checkTest
+		log "called checkTest"
+		return {a: 1, b: 2}
+
+	def grep text
+		log "grep",text
+		let lines = text.split('\n')
+		let cmd = "grep --files-with-matches --all-match -n -F $'" + text.replace(/\'/g,'\\\'') + "'"
+		let matches = []
+		let res = await execAsync(cmd)
+		console.log "grep",cmd,res
+
+		if res
+			for file in res.split("\n")
+				console.log "try to cat file",file
+				try
+					let body = await execAsync("cat-file -p master:{file}")
+					let start = 0
+					let idx 
+					
+					while (idx = body.indexOf(text,start)) >= 0
+						let match = {
+							file: file,
+							loc: idx,
+							line: util.countLines(body.slice(0,idx))
+						}
+
+						start = idx + text:length
+						matches.push(match)
+				catch e
+					log "error grepping {file}"
+
+
+		return matches
 
 	def fetch
 		return if @fetching

@@ -30,8 +30,13 @@ class SocketClient
 		
 	def onmessage msg
 		log "wss.onmessage",msg[0],msg[1]
+		let callback
+		if msg[0] isa Number
+			callback = msg.shift
+
 		if widget and widget[msg[0]] isa Function
-			widget[msg[0]].apply(widget,msg[1])
+			let res = await widget[msg[0]].apply(widget,msg[1])
+			send([-callback,res]) if callback
 		self
 	
 	def dispose

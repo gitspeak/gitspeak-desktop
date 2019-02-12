@@ -9,3 +9,6 @@ export def split
 	
 export def other
 	no
+
+export def countLines str
+	(str.match(/\r?\n/g) || ''):length + 1
