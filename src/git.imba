@@ -30,17 +30,22 @@ var FLAGS =
 export def exec command, cwd
 	cp.execSync(command, cwd: cwd, env: process:env)
 
+export def execSync command, cwd
+	cp.execSync(command, cwd: cwd, env: process:env)
+
 export def shaExists cwd, treeish
 	try
-		exec("git cat-file -t {treeish}",cwd)
+		execSync("git cat-file -t {treeish}",cwd)
 		return yes
 	catch e
 		return no
 
 export def fetchSha cwd, sha, ref
 	return yes if shaExists(cwd,sha)
+	console.log("fetchSha",cwd,sha,ref)
+
 	let cmd = ref ? "git fetch origin {ref}" : "git fetch"
-	let res = exec(cmd,cwd)
+	let res = execSync(cmd,cwd)
 
 	return yes
 
@@ -67,7 +72,7 @@ export def getGitDiff cwd, base, head, includePatch = no
 		base: base
 		diff: []
 	}
-	let raw = exec("git diff --raw --numstat {base}..{head}",cwd).toString
+	let raw = execSync("git diff --raw --numstat {base}..{head}",cwd).toString
 	let lines = raw.split('\n')
 	let len = Math.floor(lines:length * 0.5)
 	let numstat = lines.splice(len,len + 2).map do |ln|
@@ -86,13 +91,13 @@ export def getGitDiff cwd, base, head, includePatch = no
 		}
 
 		if includePatch
-			let body = exec("git cat-file -p {head}:{file}",cwd).toString
+			let body = execSync("git cat-file -p {head}:{file}",cwd).toString
 			node:body = body
 			if mode == 'A'
 				# just add the body
 				node:body = body
 			elif mode == 'M'
-				let patch = exec("git diff {base}..{head} {file}",cwd).toString
+				let patch = execSync("git diff {base}..{head} {file}",cwd).toString
 				node:patch = patch
 
 		result:diff.push node
@@ -108,7 +113,7 @@ export def getGitBlob cwd, sha, refToFetch
 	fetchSha(cwd,sha,refToFetch)
 
 	try
-		let buffer = cp.execSync('git cat-file -p ' + sha, cwd: cwd, env: process:env)
+		let buffer = execSync('git cat-file -p ' + sha, cwd)
 		# not certain that we have the oid?
 		let obj = {
 			oid: sha
@@ -130,7 +135,7 @@ export def getGitTree cwd, sha, refToFetch
 	fetchSha(cwd,sha,refToFetch)
 
 	try
-		let buffer = cp.execSync('git ls-tree -z -l ' + sha, cwd: cwd, env: process:env)
+		let buffer = execSync('git ls-tree -z -l ' + sha, cwd)
 		let tree = []
 		for line in buffer.toString.split('\0')
 			let [mode,type,sha,osize] = line.split(/(?:\ |\t)+/g)
@@ -158,7 +163,7 @@ export def getGitInfo cwd
 		return data
 	
 	if var conf = parseGitConfig.sync(cwd: cwd, path: cwd + '/.git/config')
-		let branchInfo = cp.execSync("git branch -vv --no-abbrev --no-color", cwd: cwd, env: process:env).toString
+		let branchInfo = execSync("git branch -vv --no-abbrev --no-color", cwd).toString
 		let [m,name,head,remote] = branchInfo.match(/\* (\w+)\s+([a-f\d]+)\s(?:\[([^\]]+)\])?/)
 		data:remote = remote
 
@@ -219,6 +224,12 @@ export class Git < Component
 	def exec cmd
 		# todo: add check
 		cp.execSync('git ' + cmd, cwd: cwd, env: process:env)
+
+	def execAsync cmd
+		Promise.new do |resolve,reject|
+			cp.exec('git ' + cmd, cwd: cwd, env: process:env) do |err,stdout,stderr|
+				return reject(err) if err
+				resolve(stdout.toString)
 
 	def isRepository
 		!!@summary:branch
@@ -402,7 +413,6 @@ export class GitRepo < Git
 
 	def start
 		emit('start',@summary)
-		# need to get noticed when tunnel is stopped
 		@intervals:fetch = setInterval(self:fetch.bind(self),10000)
 		sendRefs
 		self
@@ -421,8 +431,8 @@ export class GitRepo < Git
 		return if @fetching
 		emit('fetching',@fetching = yes)
 		try
-			var res = exec('fetch -a -f origin "refs/pull/*:refs/pull/*"').toString
-			console.log "result is",res
+			var res = await execAsync('fetch -a -f origin "refs/pull/*:refs/pull/*"')
+			# console.log "result is",res
 			# if there is a result - some branches may have updated -- send new refs
 			sendRefs if res and String(res):length > 2
 
