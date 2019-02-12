@@ -1,6 +1,6 @@
 {
   "name": "gitspeak",
-  "version": "0.1.71",
+  "version": "0.1.7",
   "productName": "GitSpeak",
   "description": "Desktop client for GitSpeak",
   "main": "main.js",
@@ -59,11 +59,11 @@
       "publisherName": "Scrimba AS"
     },
     "nsis": {
-      "installerIcon": "./build/icon.icns",
+      "installerIcon": "./build/icon.ico",
       "artifactName": "${productName}Setup.${ext}"
     },
     "dmg": {
-      "icon": "./build/icon.ico",
+      "icon": "./build/icon.icns",
       "artifactName": "${productName}Setup.${ext}"
     },
     "appImage": {
