@@ -83,6 +83,10 @@ async function setupTunnel(){
     TUNNEL_PORT: state.tunnelPort
   };
 
+  ['HOME','TMPDIR','USER'].forEach(function(k){
+    if(process.env[k]) env[k] = process.env[k];
+  })
+
   tunnel = cp.fork('./lib/wss', [], {
     env: env,
     cwd: __dirname,
@@ -339,7 +343,7 @@ app.on('activate', function () {
   
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (main === null) {
+  if (main == null) {
     // should not be possible(!)
     // createWindow()
   } else {
