@@ -55,12 +55,20 @@
     },
     "win": {
       "target": "NSIS",
-      "icon": "./build/icon.icns",
+      "icon": "./build/icon.ico",
       "publisherName": "Scrimba AS"
     },
     "nsis": {
-      "createDesktopShortcut": true,
-      "runAfterFinish": true    
+      "installerIcon": "./build/icon.icns",
+      "artifactName": "${productName}Setup.${ext}"
+    },
+    "dmg": {
+      "installerIcon": "./build/icon.ico",
+      "artifactName": "${productName}Setup.${ext}"
+    },
+    "appImage": {
+      "icon": "./build/icon.png",
+      "artifactName": "${productName}Setup.${ext}"
     },
     "linux": {
       "target": [
