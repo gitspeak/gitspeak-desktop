@@ -1,6 +1,6 @@
 {
   "name": "gitspeak",
-  "version": "0.1.69",
+  "version": "0.1.70",
   "productName": "GitSpeak",
   "description": "Desktop client for GitSpeak",
   "main": "main.js",
@@ -63,7 +63,7 @@
       "artifactName": "${productName}Setup.${ext}"
     },
     "dmg": {
-      "installerIcon": "./build/icon.ico",
+      "icon": "./build/icon.ico",
       "artifactName": "${productName}Setup.${ext}"
     },
     "appImage": {
