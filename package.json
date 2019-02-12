@@ -1,6 +1,6 @@
 {
   "name": "gitspeak",
-  "version": "0.1.67",
+  "version": "0.1.68",
   "productName": "GitSpeak",
   "description": "Desktop client for GitSpeak",
   "main": "main.js",
@@ -60,8 +60,7 @@
     },
     "nsis": {
       "createDesktopShortcut": true,
-      "runAfterFinish": true,
-      "installerIcon": "./build/icon.icns"
+      "runAfterFinish": true    
     },
     "linux": {
       "target": [
