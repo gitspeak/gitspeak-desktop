@@ -230,10 +230,18 @@ export class Git < Component
 		Promise.new do |resolve,reject|
 			cp.exec('git ' + cmd, cwd: cwd, env: process:env,maxBuffer: 1024 * 500) do |err,stdout,stderr|
 				return reject(err) if err
-				resolve(stdout.toString)
+				let str = stdout.toString
+				if str[str:length - 1] == '\n'
+					str = str.slice(0,-1)
+				resolve(str)
 
 	def isRepository
 		!!@summary:branch
+
+	def gitRepoRef
+		return null unless isRepository
+		let m = origin.match(/github\.com\/(.*?)(\.git)?$/)
+		m ? m[1] : null
 
 	def parseGitTree text
 		var tree = {}
@@ -433,28 +441,37 @@ export class GitRepo < Git
 		return {a: 1, b: 2}
 
 	def grep text
-		log "grep",text
+		
+		# find the last commit that is shared between local branch and upstream
+		let rootSha = await execAsync('merge-base HEAD @{u}')
+
+		log "grep",text,rootSha
 		let lines = text.split('\n')
 		let cmd = "grep --files-with-matches --all-match -n -F $'" + text.replace(/\'/g,'\\\'') + "'"
 		let matches = []
 		let res = await execAsync(cmd)
-		console.log "grep",cmd,res
+		log "grep",cmd,res
 
 		if res
 			for file in res.split("\n")
-				console.log "try to cat file",file
+				log "git cat-file -p {rootSha}:{file}"
 				try
-					let body = await execAsync("cat-file -p master:{file}")
+					let body = await execAsync("cat-file -p {rootSha}:{file}")
 					let start = 0
 					let idx 
 					
 					while (idx = body.indexOf(text,start)) >= 0
 						let match = {
+							commit: rootSha,
 							file: file,
 							loc: idx,
 							line: util.countLines(body.slice(0,idx))
 						}
 
+						# include full lines?
+						let url = "https://github.com/{gitRepoRef}/blob/{rootSha}/{file}#L{match:line}-L{match:line + lines.len}"
+						let lang = file.split(".").pop
+						match:markdown = "```{lang}\n{text}\n```\n[↳ {file}]({url})"
 						start = idx + text:length
 						matches.push(match)
 				catch e
