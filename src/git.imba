@@ -453,7 +453,12 @@ export class GitRepo < Git
 		log "grep",cmd,res
 
 		if res
-			for file in res.split("\n")
+			let files = res.split("\n")
+			if files.len > 20
+				# too many hits
+				return matches
+
+			for file in files
 				log "git cat-file -p {rootSha}:{file}"
 				try
 					let body = await execAsync("cat-file -p {rootSha}:{file}")
@@ -469,7 +474,9 @@ export class GitRepo < Git
 						}
 
 						# include full lines?
-						let url = "https://github.com/{gitRepoRef}/blob/{rootSha}/{file}#L{match:line}-L{match:line + lines.len}"
+						let url = "https://github.com/{gitRepoRef}/blob/{rootSha}/{file}#L{match:line}"
+						if lines.len > 1
+							url += "-L{match:line + lines.len - 1}"
 						let lang = file.split(".").pop
 						match:markdown = "```{lang}\n{text}\n```\n[↳ {file}]({url})"
 						start = idx + text:length
