@@ -1,6 +1,6 @@
 {
   "name": "gitspeak",
-  "version": "0.1.66",
+  "version": "0.1.76",
   "productName": "GitSpeak",
   "description": "Desktop client for GitSpeak",
   "main": "main.js",
@@ -45,23 +45,37 @@
       "provider": "github",
       "owner": "scrimba"
     },
+    "directories": {
+      "buildResources": "./build"
+    },
     "mac": {
       "target": [
-        "dmg",
-        "zip"
+        "dmg"
       ],
       "icon": "./build/icon.icns",
       "category": "your.app.category.type"
     },
     "win": {
       "target": "NSIS",
-      "icon": "./build/icon.icns",
+      "icon": "./build/icon.ico",
       "publisherName": "Scrimba AS"
+    },
+    "nsis": {
+      "installerIcon": "./build/icon.ico",
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "artifactName": "${productName}Setup.${ext}"
+    },
+    "dmg": {
+      "icon": "./build/icon.icns",
+      "artifactName": "${productName}Setup.${ext}"
+    },
+    "appImage": {
+      "artifactName": "${productName}Setup.${ext}"
     },
     "linux": {
       "target": [
-        "AppImage",
-        "deb"
+        "AppImage"
       ],
       "category": "Development"
     },
