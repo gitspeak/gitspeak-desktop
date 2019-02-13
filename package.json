@@ -13,7 +13,7 @@
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "prepare-win": "npm uninstall node-pty --save",
-    "build": "electron-builder -m --publish always",
+    "build": "electron-builder --publish always",
     "rebuild": "electron-rebuild -f -w node-pty",
     "watch": "imbac -w -o lib src",
     "postinstall": "electron-builder install-app-deps",
@@ -62,7 +62,7 @@
       "artifactName": "${productName}Setup.${ext}"
     },
     "dmg": {
-      "icon": "build/icon.icns",
+      "icon": "./build/icon.icns",
       "artifactName": "${productName}Setup.${ext}"
     },
     "appImage": {
