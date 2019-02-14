@@ -1,7 +1,7 @@
 // Modules to control application life and create native browser window
 const path = require('path')
 var fp = require("find-free-port")
-const {app, BrowserWindow,Tray,Menu,session, protocol,ipcMain, clipboard, shell, Notification} = require('electron')
+const {app, BrowserWindow,Tray,Menu,session, protocol,ipcMain, clipboard, shell, Notification, dialog} = require('electron')
 const fs = require('fs');
 const cp = require('child_process');
 const origFs = require('original-fs');
@@ -12,8 +12,6 @@ fixPath();
 
 const {fstat} = require('./lib/fs');
 const menuTemplate = require('./menu')
-console.log('process.env.GSHOST:', process.env.GSHOST)
-console.log('process.env.GH_TOKEN:', process.env.GH_TOKEN)
 
 const HOST = process.env.GSHOST || 'gitspeak.com';
 const DEBUG = process.env.DEBUG;
@@ -61,6 +59,19 @@ autoUpdater.on('download-progress', (progressObj) => {
 
 autoUpdater.on('update-downloaded', (info) => {
   devToolsLog('Update downloaded');
+  // dialog.showMessageBox({
+  //   type: 'info',
+  //   title: 'Update downloaded',
+  //   message: "We've downloaded a new version of GitSpeak for you, do you want to relaunch the app?",
+  //   buttons: ['Sure', 'No']
+  // }, (buttonIndex) => {
+  //   if (buttonIndex === 0) {
+  //     autoUpdater.quitAndInstall()
+  //   }
+  //   else {
+  //     devToolsLog('Do not quit and install');
+  //   }
+  // })
 });
 
 function rpc(name,...args){
@@ -244,7 +255,9 @@ async function setupApplication () {
 
   if (process.platform === 'darwin') {
     main.on('close', (e) => {
+      console.log('main on close')
       if(main.forceClose) return;
+      console.log('about to preventDefault')
       e.preventDefault();
       main.hide();
     })
@@ -274,6 +287,9 @@ ipcMain.on("client", function(event, arg) {
   }
 });
 
+ipcMain.on("app_release", function(event, arg) {
+  autoUpdater.checkForUpdatesAndNotify();
+})
 
 ipcMain.on("state.get", function(event, arg) {
   console.log('state.get',arg);
@@ -316,7 +332,14 @@ app.on('open-url', (event,url) => {
   }
 })
 
+
+app.on('before-quit-for-update', () => {
+  console.log('before-quit-for-update, will set main.forceclose to true', main.forceclose)
+  if(main) main.forceClose = true;
+});
+
 app.on('before-quit', () => {
+  console.log('before-quit main.forceclose: ', main.forceclose)
   if(main) main.forceClose = true;
   tunnel.send({type: 'kill'});
   tunnel.kill('SIGINT')
