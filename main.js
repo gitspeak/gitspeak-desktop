@@ -273,6 +273,9 @@ ipcMain.on("client", function(event, arg) {
   }
 });
 
+ipcMain.on("app_release", function(event, arg) {
+  autoUpdater.checkForUpdatesAndNotify();
+})
 
 ipcMain.on("state.get", function(event, arg) {
   console.log('state.get',arg);

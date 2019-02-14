@@ -1,6 +1,6 @@
 {
   "name": "gitspeak",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "productName": "GitSpeak",
   "description": "Desktop client for GitSpeak",
   "main": "main.js",
@@ -50,7 +50,8 @@
     },
     "mac": {
       "target": [
-        "dmg"
+        "dmg",
+        "zip"
       ],
       "icon": "./build/icon.icns",
       "category": "your.app.category.type"
