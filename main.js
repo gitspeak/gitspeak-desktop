@@ -193,6 +193,9 @@ async function setupApplication () {
 
   var doc = main.webContents;
   doc.on('will-navigate', function(event, url) {
+    console.log("will-navigate somewhere?!?",url);
+    event.preventDefault();
+    shell.openExternal(url);
     return this;
   });
 
@@ -256,9 +259,7 @@ async function setupApplication () {
 
 ipcMain.on("client", function(event, arg) {
   console.log("ipcmain app",arg);
-  return;
-  if(arg == 'ready'){
-    console.log("ipc ready");
+  if(arg == 'ready2'){
     if(splash && main){
       main.setBounds(splash.getBounds());
       splash.hide();
