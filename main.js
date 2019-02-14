@@ -372,6 +372,7 @@ app.on('activate', function () {
   } else {
     console.log("showing main window");
     main.show();
+    app.focus();
   } 
 })
 
