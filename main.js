@@ -59,19 +59,20 @@ autoUpdater.on('download-progress', (progressObj) => {
 
 autoUpdater.on('update-downloaded', (info) => {
   devToolsLog('Update downloaded');
-  // dialog.showMessageBox({
-  //   type: 'info',
-  //   title: 'Update downloaded',
-  //   message: "We've downloaded a new version of GitSpeak for you, do you want to relaunch the app?",
-  //   buttons: ['Sure', 'No']
-  // }, (buttonIndex) => {
-  //   if (buttonIndex === 0) {
-  //     autoUpdater.quitAndInstall()
-  //   }
-  //   else {
-  //     devToolsLog('Do not quit and install');
-  //   }
-  // })
+  dialog.showMessageBox({
+    type: 'info',
+    title: 'Update downloaded',
+    message: "We've downloaded a new version of GitSpeak for you, do you want to relaunch the app?",
+    buttons: ['Sure', 'No']
+  }, (buttonIndex) => {
+    if (buttonIndex === 0) {
+      if(main) main.forceClose = true;
+      autoUpdater.quitAndInstall();
+    }
+    else {
+      devToolsLog('Do not quit and install');
+    }
+  })
 });
 
 function rpc(name,...args){
@@ -334,12 +335,10 @@ app.on('open-url', (event,url) => {
 
 
 app.on('before-quit-for-update', () => {
-  console.log('before-quit-for-update, will set main.forceclose to true', main.forceclose)
   if(main) main.forceClose = true;
 });
 
 app.on('before-quit', () => {
-  console.log('before-quit main.forceclose: ', main.forceclose)
   if(main) main.forceClose = true;
   tunnel.send({type: 'kill'});
   tunnel.kill('SIGINT')
