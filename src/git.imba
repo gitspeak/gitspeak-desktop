@@ -65,15 +65,21 @@ export def isValidTreeish value
 4       0       src/api.imba
 9       1       src/main.imba
 1       0       www/playground.js
+
+Should be able to call this asynchronously from socket
+WARN this doesnt show actual diff between the two, but rather
+the changes in head relative to the branch of base
 ###
 export def getGitDiff cwd, base, head, includePatch = no
 
+	let baseSha = execSync("git merge-base {head} {base}",cwd).toString.trim
 	let result = {
 		head: head
-		base: base
+		base: baseSha
 		diff: []
 	}
-	let raw = execSync("git diff --raw --numstat {base}..{head}",cwd).toString
+
+	let raw = execSync("git diff --raw --numstat {baseSha}..{head}",cwd).toString
 	let lines = raw.split('\n')
 	let len = Math.floor(lines:length * 0.5)
 	let numstat = lines.splice(len,len + 2).map do |ln|
@@ -98,7 +104,7 @@ export def getGitDiff cwd, base, head, includePatch = no
 				# just add the body
 				node:body = body
 			elif mode == 'M'
-				let patch = execSync("git diff {base}..{head} {file}",cwd).toString
+				let patch = execSync("git diff {baseSha}..{head} {file}",cwd).toString
 				node:patch = patch
 
 		result:diff.push node
