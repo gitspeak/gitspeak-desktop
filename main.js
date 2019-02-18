@@ -179,11 +179,11 @@ async function setupApplication () {
     show: false,
     webPreferences: {
       partition: 'persist:main',
-      // webSecurity: false,
       preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: true, // should be disabled?
+      nodeIntegration: false,
       contextIsolation: false,
       nativeWindowOpen: true,
+      allowRunningInsecureContent: false,
       backgroundThrottling: false,
       affinity: 'myAffinity'
     }
