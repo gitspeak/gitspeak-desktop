@@ -24,7 +24,7 @@ const gotTheLock = app.requestSingleInstanceLock();
 let main
 let splash
 let tunnel
-let initialUrl = '/';
+let initialUrl = process.env.INITIAL_URL || '/';
 let state = {
   tunnelPort: null
 };
@@ -214,6 +214,11 @@ async function setupApplication () {
   doc.on('new-window', (event, url, frameName, disposition, options, additionalFeatures) => {
     console.log('new-window',frameName);
 
+    shell.openExternal(url);
+    // Always open externally now
+    return;
+
+
     var outerPos = main.getPosition();
     var outerSize = main.getSize();
 
@@ -221,6 +226,7 @@ async function setupApplication () {
 
     if(frameName == 'ghlogin'){
       shell.openExternal(url);
+      // Always open externally now
       return;
     }
 
@@ -255,10 +261,13 @@ async function setupApplication () {
   })
 
   if (process.platform === 'darwin') {
+    // when user tries to close main window on mac
+    // we simply hide it instead, to be able to quicky
+    // show it again when app is reactivated.
     main.on('close', (e) => {
-      console.log('main on close')
+      // if main window is closing because the user
+      // is quitting the app, we don't want to preventDefault
       if(main.forceClose) return;
-      console.log('about to preventDefault')
       e.preventDefault();
       main.hide();
     })
@@ -273,15 +282,6 @@ async function setupApplication () {
 
 ipcMain.on("client", function(event, arg) {
   console.log("ipcmain app",arg);
-  if(arg == 'ready2'){
-    if(splash && main){
-      main.setBounds(splash.getBounds());
-      splash.hide();
-      splash.destroy();
-      splash = null;
-      main.show();
-    }
-  }
 
   if(arg == 'focus'){
     app.focus();
