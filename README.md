@@ -1,8 +1,8 @@
-# GitSpeak makes your GitHub Issues more powerful and easier to manage
+# A powerful client for GitHub repositories
 
 ### ...without asking for access to your codebase
 
-Our goal is to make it easier for your team to discuss code. Through our desktop app, you'll be able to easily manage your Issues and Pull Requests, while also getting powerful tools to talk about your codebase.
+Our goal is to make it easier for your team to discuss code. Through this desktop app, you'll be able to easily manage your Issues and Pull Requests, while also getting powerful tools to talk about your codebase.
 
 Some of the benefits of using GitSpeak:
 
