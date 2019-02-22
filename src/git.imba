@@ -85,8 +85,6 @@ export def getGitDiff cwd, base, head, includePatch = no
 	let numstat = lines.splice(len,len + 2).map do |ln|
 		ln.split(/\s+/).map do |item| (/^\d+$/).test(item) ? parseInt(item) : item
 
-
-
 	for entry,i in lines
 		let mode = entry.split(/[\s\t]/)[4]
 		let file = entry.slice(entry.indexOf('\t') + 1)
@@ -98,14 +96,16 @@ export def getGitDiff cwd, base, head, includePatch = no
 		}
 
 		if includePatch
-			let body = execSync("git cat-file -p {head}:{file}",cwd).toString
-			node:body = body
-			if mode == 'A'
-				# just add the body
+			if mode == 'A' or mode == 'M'
+				# Should also check size and if binary
+				let body = execSync("git cat-file -p {head}:{file}",cwd).toString
 				node:body = body
-			elif mode == 'M'
-				let patch = execSync("git diff {baseSha}..{head} {file}",cwd).toString
-				node:patch = patch
+				if mode == 'M'
+					let patch = execSync("git diff {baseSha}..{head} {file}",cwd).toString
+					node:patch = patch
+			elif mode == 'D'
+				# possibly include the previous value?
+				yes
 
 		result:diff.push node
 	return result
