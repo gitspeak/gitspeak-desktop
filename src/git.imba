@@ -449,7 +449,8 @@ export class GitRepo < Git
 	def grep text
 		
 		# find the last commit that is shared between local branch and upstream
-		let rootSha = await execAsync('merge-base HEAD @{u}')
+		# FIXME now always looking for the location relative to remote HEAD
+		let rootSha = await execAsync('merge-base HEAD refs/remotes/origin/HEAD')
 
 		log "grep",text,rootSha
 		let lines = text.split('\n')
@@ -466,11 +467,22 @@ export class GitRepo < Git
 
 			for file in files
 				log "git cat-file -p {rootSha}:{file}"
+				var sha = rootSha
+				# if the file does not exist 
 				try
-					let body = await execAsync("cat-file -p {rootSha}:{file}")
+					# if the file does not exist in HEAD - or the position is different
+					let body
+					try
+						body = await execAsync("cat-file -p {sha}:{file}")
+
+					if !body or body.indexOf(text) == -1
+						sha = await execAsync("rev-parse HEAD")
+						body = await execAsync("cat-file -p {sha}:{file}")
+						log "could not find from remote head, use local head instead {sha}"
+
 					let start = 0
 					let idx 
-					
+
 					while (idx = body.indexOf(text,start)) >= 0
 						let match = {
 							commit: rootSha,
@@ -489,7 +501,6 @@ export class GitRepo < Git
 						matches.push(match)
 				catch e
 					log "error grepping {file}"
-
 
 		return matches
 
