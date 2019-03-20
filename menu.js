@@ -29,8 +29,7 @@ exports.template = template = [
       {role: 'delete'},
       {role: 'selectall'}
     ]
-  }
-  /*,
+  },
   {
     label: 'View',
     submenu: [
@@ -61,7 +60,6 @@ exports.template = template = [
       }
     ]
   }
-  */
 ]
 
 if (process.platform === 'darwin') {
