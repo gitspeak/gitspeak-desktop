@@ -101,7 +101,7 @@ export def getGitDiff cwd, base, head, includePatch = no
 				let body = execSync("git cat-file -p {head}:{file}",cwd).toString
 				node:body = body
 				if mode == 'M'
-					let patch = execSync("git diff {baseSha}..{head} {file}",cwd).toString
+					let patch = execSync("git diff {baseSha}..{head} -- {file}",cwd).toString
 					node:patch = patch
 			elif mode == 'D'
 				# possibly include the previous value?
@@ -450,7 +450,15 @@ export class GitRepo < Git
 		
 		# find the last commit that is shared between local branch and upstream
 		# FIXME now always looking for the location relative to remote HEAD
-		let rootSha = await execAsync('merge-base HEAD refs/remotes/origin/HEAD')
+
+		# find last commit in history that we know is synced to the remote
+		var rootSha = null # await execAsync('merge-base HEAD @{u}')
+		let lastOriginCommit = await execAsync('log --remotes=origin -1 --pretty=oneline')
+		if lastOriginCommit
+			rootSha = lastOriginCommit.split(" ")[0]
+
+		# let rootSha = await execAsync('merge-base HEAD @{u}')
+		# refs/remotes/origin/HEAD
 
 		log "grep",text,rootSha
 		let lines = text.split('\n')
