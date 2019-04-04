@@ -28,6 +28,11 @@ var FLAGS =
 	"R": 256
 	"?": 2
 
+
+var validate =
+	ref: do |val| (/^[\:\/\-\.\w]+$/).test(val)
+	sha: do |val| (/^[\:\/\-\.\w]+$/).test(val)
+
 export def exec command, cwd
 	cp.execSync(command, cwd: cwd, env: process:env)
 
@@ -71,6 +76,7 @@ WARN this doesnt show actual diff between the two, but rather
 the changes in head relative to the branch of base
 ###
 export def getGitDiff cwd, base, head, includePatch = no
+	console.log "getGitDiff",cwd,base,head
 
 	let baseSha = execSync("git merge-base {head} {base}",cwd).toString.trim
 	let result = {
@@ -406,6 +412,7 @@ export class GitRepo < Git
 		@summary = {}
 		@intervals = {}
 		@refs = {}
+
 		if var repo = gitRepoInfo._findRepo(cwd)
 			var info = gitRepoInfo(cwd)
 			@summary:branch = info:branch
@@ -428,18 +435,23 @@ export class GitRepo < Git
 
 	def start
 		emit('start',@summary)
-		@intervals:fetch = setInterval(self:fetch.bind(self),10000)
+		# dont fetch all the time
+		# @intervals:fetch = setInterval(self:fetch.bind(self),10000)
+		updateRefs
 		sendRefs
 		self
 
-	def sendRefs
-		# only send changed refs
+	def updateRefs
 		let refs = {}
 		let rawRefs = exec('show-ref').toString
 		for line in rawRefs.split(LINESEP)
 			var [sha,ref] = line.split(" ")
 			refs[ref] = sha
-		emit('refs',refs)
+		@refs = refs
+		self
+
+	def sendRefs
+		emit('refs',@refs)
 		self
 
 	def checkTest
@@ -519,12 +531,34 @@ export class GitRepo < Git
 			var res = await execAsync('fetch -a -f origin "refs/pull/*:refs/pull/*"')
 			# console.log "result is",res
 			# if there is a result - some branches may have updated -- send new refs
-			sendRefs if res and String(res):length > 2
+			if res and String(res):length > 2
+				updateRefs
+				sendRefs
 
 		catch e
 			self
+
 		emit('fetched',@fetching = no)
 		return
+
+	def fetch_ref ref, expectedSha
+		# console.log "fetch_ref",ref,expectedSha
+		unless validate.ref(ref)
+			return null
+
+		try
+			let curr = @refs[ref]
+
+			if expectedSha and curr == expectedSha
+				return curr
+			var cmd = "fetch -a -f origin \"{ref}:{ref}\""
+			# console.log "call cmd",cmd
+			var res = await execAsync(cmd)
+			# console.log "result from cmd",res
+			updateRefs
+			return @refs[ref]
+		return 10
+
 		
 	def dispose
 		clearInterval(@intervals:fetch)

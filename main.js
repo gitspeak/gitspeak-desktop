@@ -15,6 +15,10 @@ const menuTemplate = require('./menu')
 
 const HOST = process.env.GSHOST || 'gitspeak.com';
 const DEBUG = process.env.DEBUG;
+// const AFFINITY = DEBUG ? 'debug' : 'myAffinity';
+// const PARTITION =  DEBUG ? 'persist:debug' : 'persist:main';
+const PARTITION =  'persist:' + HOST;
+const AFFINITY =  'affinity:' + HOST;
 // process.noAsar = true;
 
 const gotTheLock = app.requestSingleInstanceLock();
@@ -178,14 +182,14 @@ async function setupApplication () {
     vibrancy: null,
     show: false,
     webPreferences: {
-      partition: 'persist:main',
+      partition: PARTITION,
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: false,
       nativeWindowOpen: true,
       allowRunningInsecureContent: false,
       backgroundThrottling: false,
-      affinity: 'myAffinity'
+      affinity: AFFINITY
     }
   })
 
@@ -248,8 +252,8 @@ async function setupApplication () {
 
       options.webPreferences = Object.assign({
           preload: path.join(__dirname, 'extwindow.js'),
-          partition: 'persist:main',
-          affinity: 'myAffinity'
+          partition: PARTITION,
+          affinity: AFFINITY
         },
         options.webPreferences,
         frameDefaults.webPreferences || {}
@@ -257,6 +261,7 @@ async function setupApplication () {
 
       event.newGuest = new BrowserWindow(options)
       // event.newGuest.on('focus',()=> {state.currentWindow = event.newGuest});
+
     }
   })
 
