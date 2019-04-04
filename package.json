@@ -59,7 +59,8 @@
     "win": {
       "target": "NSIS",
       "icon": "./build/icon.ico",
-      "publisherName": "Scrimba AS"
+      "publisherName": "Scrimba AS",
+      "rfc3161TimeStampServer": "http://sha256timestamp.ws.symantec.com/sha256/timestamp"
     },
     "nsis": {
       "installerIcon": "./build/icon.ico",
