@@ -78,6 +78,7 @@ the changes in head relative to the branch of base
 export def getGitDiff cwd, base, head, includePatch = no
 	console.log "getGitDiff",cwd,base,head
 
+
 	let baseSha = execSync("git merge-base {head} {base}",cwd).toString.trim
 	let result = {
 		head: head
@@ -102,8 +103,12 @@ export def getGitDiff cwd, base, head, includePatch = no
 		}
 
 		if includePatch
+			if node:ins == '-'
+				continue
+
 			if mode == 'A' or mode == 'M'
 				# Should also check size and if binary
+
 				let body = execSync("git cat-file -p {head}:{file}",cwd).toString
 				node:body = body
 				if mode == 'M'
@@ -252,7 +257,7 @@ export class Git < Component
 
 	def gitRepoRef
 		return null unless isRepository
-		let m = origin.match(/github\.com\/(.*?)(\.git)?$/)
+		let m = origin.match(/github\.com[\/\:](.*?)(\.git)?$/)
 		m ? m[1] : null
 
 	def parseGitTree text
