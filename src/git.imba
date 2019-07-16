@@ -241,16 +241,32 @@ export class Git < Component
 
 	def exec cmd
 		# todo: add check
-		cp.execSync('git ' + cmd, cwd: cwd, env: process:env)
+		if cmd isa Array
+			cp.execFileSync('git',cmd, cwd: cwd, env: process:env)
+		else
+			cp.execSync('git ' + cmd, cwd: cwd, env: process:env)
 
 	def execAsync cmd
 		Promise.new do |resolve,reject|
-			cp.exec('git ' + cmd, cwd: cwd, env: process:env,maxBuffer: 1024 * 500) do |err,stdout,stderr|
-				return reject(err) if err
+			var o = {cwd: cwd, env: process:env, maxBuffer: 1024 * 500}
+			var handler =  do |err,stdout,stderr|
+				if err
+					log "error from exec"
+					log err and err:message
+					log stderr.toString
+					return reject(err)
+
 				let str = stdout.toString
 				if str[str:length - 1] == '\n'
 					str = str.slice(0,-1)
 				resolve(str)
+
+			if cmd isa Array
+				log "cmd is array"
+				o:encoding = 'utf-8'
+				cp.execFile('git',cmd,o,handler)
+			else
+				cp.exec('git ' + cmd, o,handler)
 
 	def isRepository
 		!!@summary:branch
@@ -477,12 +493,25 @@ export class GitRepo < Git
 		# let rootSha = await execAsync('merge-base HEAD @{u}')
 		# refs/remotes/origin/HEAD
 
-		log "grep",text,rootSha
+		
 		let lines = text.split('\n')
-		let cmd = "grep --files-with-matches --all-match -n -F $'" + text.replace(/\'/g,'\\\'') + "'"
+		let cmd = [
+			"grep"
+			"--files-with-matches"
+			"--all-match"
+			"-n"
+			"-F"
+			'-e'
+			text
+		]
+
 		let matches = []
-		let res = await execAsync(cmd)
-		log "grep",cmd,res
+		let res
+		log "grep",JSON.stringify(text),lines:length,cmd,text.indexOf('\t')
+		try
+			res = await execAsync(cmd)
+		catch e
+			return []
 
 		if res
 			let files = res.split("\n")
@@ -521,6 +550,9 @@ export class GitRepo < Git
 						if lines.len > 1
 							url += "-L{match:line + lines.len - 1}"
 						let lang = file.split(".").pop
+						match:permalink = url
+						match:code = text
+						match:language = lang
 						match:markdown = "```{lang}\n{text}\n```\n[↳ {file}]({url})"
 						start = idx + text:length
 						matches.push(match)
