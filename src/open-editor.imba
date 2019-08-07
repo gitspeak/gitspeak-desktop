@@ -18,4 +18,5 @@ export def openEditor editor, file, line
 	console.log cmd
 	return ""
 
+console.log "LOCAL"
 openEditor EDITOR:SUBLIME, "main.js", 14
