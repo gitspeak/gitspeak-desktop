@@ -63,6 +63,11 @@ class RepoClient < SocketClient
 			log 'ws.git',type,params
 			send([type,params])
 		widget.start
+# TODO: stub out this
+# class EditorClient < SocketClient
+
+# 	def setup opts
+# 		widget = 
 
 export class SocketServer
 	
