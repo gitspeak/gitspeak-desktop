@@ -42,6 +42,10 @@ window.interop = {
       shell.openExternal(url);
     },
 
+    openEditor(path) {
+      return ipcRenderer.sendSync('openEditor',path)
+    },
+
     getSync(key){
       return ipcRenderer.sendSync('state.get',key)
     },
