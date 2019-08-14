@@ -17,35 +17,17 @@ def get_cmd_fmt editor,file,line
 			# - code in $PATH
 			# TODO: Linux?
 			# TODO: Windows?
-			"{editor} -g {file}:{line}"
+			"/Applications/Visual\\ Studio\\ Code.app/Contents/Resources/app/bin/code -g {file}:{line}"
 		when EDITOR:SUBLIME
 			# TODO: get the path to sublime
 			"{editor} {file}:{line}"
 
-def openEditor cwd, editor, file, line
-	console.log "openEditor",editor,file,line
-	const cmd = get_cmd_fmt editor, file, line
-	cp.execSync(cmd, cwd: cwd, env: process:env)
+export def openEditor data
+	const startLine = data:startLine
+	const repoPath = data:repoPath
+	const absPath = data:absPath
+	const gitref = data:gitref
+	const lines = data:lines
 
-
-export class OpenEditor < Component
-
-	def initialize owner, options
-		@owner = owner
-		@options = options		
-		# TODO: handle process failures
-		openEditor cwd, options:editor, options:file, options:line
-
-	def log *params
-		@owner?.log(*params)
-		
-	def write string
-		@runner?.write(string)
-	
-	def dispose
-		self
-
-
-
-const cwd = '/Users/scanf/src/github.com/scanf/gitspeak-desktop'
-openEditor cwd, EDITOR:SUBLIME, "main.js", 14
+	const cmd = get_cmd_fmt(EDITOR:VSCODE, absPath, startLine)
+	cp.execSync(cmd, cwd: repoPath, env: process:env)

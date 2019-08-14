@@ -307,18 +307,6 @@ ipcMain.on("fstat", function(event, dir) {
   event.returnValue = fstat(dir);
 })
 
-ipcMain.on("openEditor", function(event, params) {
-  let path = params.absPath + ":" + params.startLine;
-  console.log('openEditor',path,params);
-  let env = {PATH: process.env.PATH};
-  ['HOME','TMPDIR','USER'].forEach(function(k){
-    if(process.env[k]) env[k] = process.env[k];
-  })
-
-  cp.execSync("st " + path, [], {env: env, cwd: __dirname});
-  event.returnValue = {pathToOpen: path};
-})
-
 function setupRequestInterceptor(){
   // try to intercept http requests
   const filter = {
