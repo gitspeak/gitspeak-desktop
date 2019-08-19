@@ -46,6 +46,10 @@ window.interop = {
       return machine.openEditor(data)
     },
 
+    getAvailableEditors() {
+      return machine.getAvailableEditors()
+    },
+
     getSync(key){
       return ipcRenderer.sendSync('state.get',key)
     },
