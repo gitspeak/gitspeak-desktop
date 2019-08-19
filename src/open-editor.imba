@@ -29,6 +29,18 @@ def get_cmd_fmt editor,file,line
 		when "sublime"
 			"{bin} {file}:{line}"
 
+###
+The line might have changed since it became a snippet.
+Try to use git blame to find the correct line.
+###
+def normalizeLine path,line,gitref,repoPath
+	const cmd = "git blame -L {line},{line} -n --reverse {gitref}..head -- {path}"
+	const output = cp.execSync(cmd, cwd: repoPath, env: process:env).toString()
+	# Uncomment the below line to look at the output format and command
+	# console.log "cmd",cmd,"output",output
+	if output
+		output.split(' ')[1]
+
 export def openEditor data
 	const startLine = data:startLine
 	const repoPath = data:repoPath
@@ -36,8 +48,11 @@ export def openEditor data
 	const gitref = data:gitref
 	const lines = data:lines
 	const editor = data:editor
+	const path = data:path
 
-	const cmd = get_cmd_fmt(editor, absPath, startLine)
+	const normalize = normalizeLine(path, startLine, gitref, repoPath)
+	let line = normalize ? normalize : startLine
+	const cmd = get_cmd_fmt(editor, absPath, line)
 	if not cmd:error
 		cp.execSync(cmd, cwd: repoPath, env: process:env)
 	else
