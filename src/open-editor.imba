@@ -14,8 +14,7 @@ const EDITOR = {
 	}
 }
 
-def get_cmd_fmt editor,file,line
-	console.log "get_cmd_fmt",editor,file,line
+def get_cmd_fmt editor,file,line	
 	const type = EDITOR["{editor}"]
 	if not type
 		return { error: "Unknown editor" }
@@ -41,4 +40,5 @@ export def openEditor data
 	if not cmd:error
 		cp.execSync(cmd, cwd: repoPath, env: process:env)
 	else
+		# TODO: give the user feedback
 		cmd:error
