@@ -46,7 +46,6 @@ export def openEditor data
 	const repoPath = data:repoPath
 	const absPath = data:absPath
 	const gitref = data:gitref
-	const lines = data:lines
 	const editor = data:editor
 	const path = data:path
 
