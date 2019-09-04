@@ -17,7 +17,7 @@ window.interop = {
       message: "Open folder...",
       properties: ['openDirectory']
     },o || {});
-  	var res = remote.dialog.showOpenDialog(remote.getCurrentWindow(),opts);
+  	var res = remote.dialog.showOpenDialogSync(remote.getCurrentWindow(),opts);
   	return res && res[0];
   },
 
