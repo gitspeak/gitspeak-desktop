@@ -32,6 +32,7 @@ let initialUrl = process.env.INITIAL_URL || '/';
 let state = {
   tunnelPort: null
 };
+
 var logQueue = [];
 
 // Start tunnel in separate process to avoid blocking main thread.
@@ -188,14 +189,12 @@ async function setupApplication () {
       contextIsolation: false,
       nativeWindowOpen: true,
       allowRunningInsecureContent: false,
-      backgroundThrottling: false,
-      affinity: AFFINITY
+      backgroundThrottling: false
     }
   })
 
   var menu = Menu.buildFromTemplate(menuTemplate.template);
   Menu.setApplicationMenu(menu);
-  state.currentWindow = main;
   main.loadURL("https://" + HOST + initialUrl);
   devToolsLog(logQueue);
 
@@ -217,11 +216,8 @@ async function setupApplication () {
 
   doc.on('new-window', (event, url, frameName, disposition, options, additionalFeatures) => {
     console.log('new-window',frameName);
-
     shell.openExternal(url);
-    // Always open externally now
     return;
-
 
     var outerPos = main.getPosition();
     var outerSize = main.getSize();
@@ -260,8 +256,6 @@ async function setupApplication () {
       );
 
       event.newGuest = new BrowserWindow(options)
-      // event.newGuest.on('focus',()=> {state.currentWindow = event.newGuest});
-
     }
   })
 
