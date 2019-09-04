@@ -1,6 +1,6 @@
 {
   "name": "gitspeak",
-  "version": "0.2.31",
+  "version": "0.2.32",
   "productName": "GitSpeak",
   "description": "Desktop client for GitSpeak",
   "main": "main.js",
@@ -34,9 +34,9 @@
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "^6.0.7",
-    "electron-builder": "^20.38.5",
+    "electron-builder": "^21.2.0",
     "electron-packager": "^12.2.0",
-    "electron-rebuild": "^1.8.3"
+    "electron-rebuild": "^1.8.6"
   },
   "build": {
     "appId": "com.gitspeak.app",
