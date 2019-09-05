@@ -198,6 +198,7 @@ async function setupApplication () {
   main.loadURL("https://" + HOST + initialUrl);
   devToolsLog(logQueue);
 
+  main.setAutoHideMenuBar(true);
   main.on('show',function(event){
     if(splash){
       splash.hide();
