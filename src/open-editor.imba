@@ -34,19 +34,20 @@ The line might have changed since it became a snippet.
 Try to use git blame to find the correct line.
 ###
 def normalizeLine path,line,gitref,repoPath
-	const cmd = "git blame -L {line},{line} -n --reverse {gitref}..head -- {path}"
-	const output = cp.execSync(cmd, cwd: repoPath, env: process:env).toString()
-	# Uncomment the below line to look at the output format and command
-	# console.log "cmd",cmd,"output",output
-	if output
-		output.split(' ')[1]
+	try
+		const cmd = "git blame -L {line},{line} -n --reverse {gitref}..head -- {path}"
+		const output = try cp.execSync(cmd, cwd: repoPath, env: process:env).toString()
+		# Uncomment the below line to look at the output format and command
+		console.log "cmd",cmd,"output",output
+		if output
+			return output.split(' ')[1]
+	console.log "normalize failed"
 
 export def openEditor data
 	const startLine = data:startLine
 	const repoPath = data:repoPath
 	const absPath = data:absPath
 	const gitref = data:gitref
-	const lines = data:lines
 	const editor = data:editor
 	const path = data:path
 
