@@ -50,6 +50,12 @@ window.interop = {
       return machine.getAvailableEditors()
     },
 
+    print() {
+      console.log('here');
+      const win = remote.getCurrentWindow();
+      return win.webContents.print({silent:false, printBackground:false});
+    },
+
     getSync(key){
       return ipcRenderer.sendSync('state.get',key)
     },
