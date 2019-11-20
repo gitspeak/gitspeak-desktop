@@ -8,11 +8,7 @@ def exec cmd
 
 # tag the version
 
-exec("git tag v{pkg:version}")
 exec("git push origin --tags")
 exec("git push origin master:release")
 exec("hub release create -d -m \"v{pkg:version}\" v{pkg:version}")
 # now create the release on github
-
-
-
