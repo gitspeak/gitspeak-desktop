@@ -480,6 +480,8 @@ export class GitRepo < Git
 		return {a: 1, b: 2}
 
 	def grep text
+		# Trim the text so trailing newlines will not prevent a match.
+		text = text.trim()
 		
 		# find the last commit that is shared between local branch and upstream
 		# FIXME now always looking for the location relative to remote HEAD
