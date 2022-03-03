@@ -1,4 +1,7 @@
-const {remote,ipcRenderer} = require('electron');
+const {ipcRenderer} = require('electron');
+const remote = require('@electron/remote');
+const remoteMain = remote.require("@electron/remote/main");
+remoteMain.enable(window.webContents);
 
 window.GitSpeak = {
   ipc: {

@@ -1,3 +1,7 @@
+const remoteMain = require('@electron/remote/main');
+// remoteMain.enable(window.webContents)
+remoteMain.initialize();
+
 // Modules to control application life and create native browser window
 const path = require('path')
 var fp = require("find-free-port")
@@ -208,6 +212,7 @@ async function setupApplication () {
   });
 
   var doc = main.webContents;
+  remoteMain.enable(doc);
   doc.on('will-navigate', function(event, url) {
     console.log("will-navigate somewhere?!?",url);
     event.preventDefault();

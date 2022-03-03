@@ -34,7 +34,7 @@
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "^17.1.0",
-    "electron-builder": "^21.2.0",
+    "electron-builder": "^22.14.13",
     "electron-packager": "^12.2.0",
     "electron-rebuild": "^1.8.6"
   },
@@ -50,8 +50,10 @@
     },
     "mac": {
       "target": [
-        "dmg",
-        "zip"
+        {
+          "target": "default",
+          "arch": "universal"
+        }
       ],
       "icon": "./build/icon.icns",
       "category": "your.app.category.type"
@@ -92,6 +94,7 @@
     ]
   },
   "dependencies": {
+    "@electron/remote": "^2.0.5",
     "electron-log": "^2.2.17",
     "electron-updater": "^4.0.3",
     "find-free-port": "^2.0.0",

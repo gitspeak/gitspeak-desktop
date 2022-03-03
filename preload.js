@@ -1,7 +1,8 @@
 // ==============
 // Preload script
 // ==============
-const {remote,ipcRenderer,shell} = require('electron');
+const {ipcRenderer,shell} = require('electron');
+const remote = require('@electron/remote');
 
 const machine = remote.require('./machine')
 
