@@ -107,7 +107,7 @@
     "msgpack-lite": "^0.1.26",
     "node-watch": "^0.5.8",
     "parse-git-config": "^2.0.3",
-    "simple-git": "^1.106.0",
+    "simple-git": "^3.5.0",
     "ws": "^6.1.0"
   }
 }
