@@ -33,7 +33,7 @@
   ],
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^17.1.0",
+    "electron": "^17.2.0",
     "electron-builder": "^22.14.13",
     "electron-packager": "^12.2.0",
     "electron-rebuild": "^1.8.6"
